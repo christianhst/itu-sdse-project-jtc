@@ -69,9 +69,8 @@ def wait_for_deployment(model_name, model_version, stage="Staging"):
     return status
 
 
-def create_directoties():
+def create_directories():
     os.makedirs("artifacts", exist_ok=True)
     os.makedirs("mlruns", exist_ok=True)
     os.makedirs("mlruns/.trash", exist_ok=True)
-    os.makedirs("artifacts", exist_ok=True)
     print("Created artifact and mlruns directories")
