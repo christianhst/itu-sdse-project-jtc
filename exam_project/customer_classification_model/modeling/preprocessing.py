@@ -1,33 +1,12 @@
-# import warnings
-
 from datetime import datetime
 import json
 
 import numpy as np
 import pandas as pd
 
-# warnings.filterwarnings("ignore")
-# pd.set_option("display.float_format", lambda x: "%.3f" % x)
-
 # Date limits for data
 max_date = "2024-01-31"
 min_date = "2024-01-01"
-
-
-def load_data(file_path: str) -> pd.DataFrame:
-    """Load dataset from a CSV file.
-
-    Args:
-        file_path (str): Path to the CSV file.
-
-    Returns:
-        pd.DataFrame: Loaded dataset.
-    """
-    data = pd.read_csv(file_path)
-
-    print("Total rows:", data.count())
-    print(data.head().to_string())
-    return data
 
 
 def time_limit_data(data: pd.DataFrame, max_date=max_date, min_date=min_date):
