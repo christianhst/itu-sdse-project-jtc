@@ -3,6 +3,7 @@
 from datetime import datetime
 import json
 
+import numpy as np
 import pandas as pd
 
 # warnings.filterwarnings("ignore")
@@ -29,7 +30,7 @@ def load_data(file_path: str) -> pd.DataFrame:
     return data
 
 
-def time_limit_data(data: pd.DataFrame, max_date=max_date, min_date=min_date) -> pd.DataFrame:
+def time_limit_data(data: pd.DataFrame, max_date=max_date, min_date=min_date):
     """Limit data to a specific date range and save the limits to a JSON file.
 
     Args:
@@ -53,3 +54,57 @@ def time_limit_data(data: pd.DataFrame, max_date=max_date, min_date=min_date) ->
     date_limits = {"min_date": str(min_date), "max_date": str(max_date)}
     with open("./artifacts/date_limits.json", "w") as f:
         json.dump(date_limits, f)
+
+
+def feature_selection(data: pd.DataFrame) -> pd.DataFrame:
+    """Select features by removing specific columns from the DataFrame.
+
+    Args:
+        data (pd.DataFrame): Input DataFrame.
+
+        Returns:
+        pd.DataFrame: DataFrame with selected features.
+    """
+
+    # Removing columns that will be added back after the EDA
+    data = data.drop(
+        [
+            "is_active",
+            "marketing_consent",
+            "first_booking",
+            "existing_customer",
+            "last_seen",
+            "domain",
+            "country",
+            "visited_learn_more_before_booking",
+            "visited_faq",
+        ],
+        axis=1,
+    )
+    return data
+
+
+def data_cleaning(data: pd.DataFrame) -> pd.DataFrame:
+    """Clean the data by handling missing values and filtering.
+
+    Args:
+        data (pd.DataFrame): Input DataFrame.
+
+    Returns:
+        pd.DataFrame: Cleaned DataFrame.
+    """
+
+    data["lead_indicator"].replace("", np.nan, inplace=True)
+    data["lead_id"].replace("", np.nan, inplace=True)
+    data["customer_code"].replace("", np.nan, inplace=True)
+
+    data = data.dropna(axis=0, subset=["lead_indicator"])
+    data = data.dropna(axis=0, subset=["lead_id"])
+
+    data = data[data.source == "signup"]
+    result = data.lead_indicator.value_counts(normalize=True)
+
+    print("Target value counter")
+    for val, n in zip(result.index, result):
+        print(val, ": ", n)
+    return data
