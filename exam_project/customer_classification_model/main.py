@@ -1,4 +1,4 @@
-# Only for deployment purposes
+# Only for development purposes
 
 from data_utils import create_directories
 from dataset import load_data
