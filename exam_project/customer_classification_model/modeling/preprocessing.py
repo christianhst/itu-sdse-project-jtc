@@ -87,3 +87,39 @@ def data_cleaning(data: pd.DataFrame) -> pd.DataFrame:
     for val, n in zip(result.index, result):
         print(val, ": ", n)
     return data
+
+def create_cat_cols(data: pd.DataFrame) -> pd.DataFrame:
+    """Convert specified columns to categorical (object) type.
+
+    Args:
+        data (pd.DataFrame): Input DataFrame.
+
+    Returns:
+        pd.DataFrame: DataFrame with categorical columns converted to object type.
+    """
+    vars = [
+    "lead_id", "lead_indicator", "customer_group", "onboarding", "source", "customer_code"
+    ]
+
+    for col in vars:
+        data[col] = data[col].astype("object")
+        print(f"Changed {col} to object type")
+    return data
+
+def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
+    """xx
+    
+    Args:
+        data (pd.DataFrame): Input DataFrame.
+    
+    Returns:
+    """
+
+    cont_vars = data.loc[:, ((data.dtypes=="float64")|(data.dtypes=="int64"))]
+    cat_vars = data.loc[:, (data.dtypes=="object")]
+
+    print("\nContinuous columns: \n")
+    pprint(list(cont_vars.columns), indent=4)
+    print("\n Categorical columns: \n")
+    pprint(list(cat_vars.columns), indent=4)
+    return cont_vars, cat_vars
