@@ -1,8 +1,11 @@
 from datetime import datetime
+from  customer_classification_model.data_utils import impute_missing_values
+
 import json
 
 import numpy as np
 import pandas as pd
+
 
 # Date limits for data
 max_date = "2024-01-31"
@@ -119,7 +122,54 @@ def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
     cat_vars = data.loc[:, (data.dtypes=="object")]
 
     print("\nContinuous columns: \n")
-    pprint(list(cont_vars.columns), indent=4)
+    print(list(cont_vars.columns), indent=4)
     print("\n Categorical columns: \n")
-    pprint(list(cat_vars.columns), indent=4)
+    print(list(cat_vars.columns), indent=4)
     return cont_vars, cat_vars
+
+def outliers(cont_vars: pd.DataFrame, z: float = 2.0) -> pd.DataFrame:
+    """Detect outliers in continuous variables using +-z standard deviations.
+
+    Args:
+        cont_vars (pd.DataFrame): continuous variables.
+        z (float): Number of standard deviations for clipping.
+        
+    Returns:
+        pd.DataFrame: DataFrame with outliers clipped.
+    """
+    cont_vars = cont_vars.apply(
+        lambda x: x.clip(
+            lower=x.mean() - z * x.std(),
+            upper=x.mean() + z * x.std()
+        )
+    )
+    
+    return cont_vars
+
+def impute_continuous(cont_vars: pd.DataFrame) -> pd.DataFrame:
+    """Impute missing values in continuous columns.
+    
+    Args:
+        cont_vars (pd.DataFrame): DataFrame containing continuous variables.
+        
+    Returns:
+        pd.DataFrame: DataFrame with missing continuous values imputed.
+    """
+    cont_vars = cont_vars.apply(impute_missing_values, method="mean")
+    return cont_vars
+
+
+def impute_categorical(cat_vars: pd.DataFrame) -> pd.DataFrame:
+    """Impute missing values in categorical columns.
+    
+    Args:
+        cat_vars (pd.DataFrame): DataFrame containing categorical variables.
+        
+    Returns:
+        pd.DataFrame: DataFrame with missing categorical values imputed.
+    """
+    if "customer_code" in cat_vars.columns:
+        cat_vars.loc[cat_vars["customer_code"].isna(), "customer_code"] = "None"
+
+    cat_vars = cat_vars.apply(impute_missing_values)
+    return cat_vars
