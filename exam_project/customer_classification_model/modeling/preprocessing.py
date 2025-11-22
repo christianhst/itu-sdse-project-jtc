@@ -196,5 +196,24 @@ def standardize_continuous(
     joblib.dump(value=scaler, filename=scaler_path)
 
     # Transform the continuous variables
-    cont_scaled = pd.DataFrame(scaler.transform(cont_vars), columns=cont_vars.columns)
-    return cont_scaled
+    cont_vars = pd.DataFrame(scaler.transform(cont_vars), columns=cont_vars.columns)
+    return cont_vars
+
+
+def combine_cat_and_cont(cont_vars: pd.DataFrame, cat_vars: pd.DataFrame) -> pd.DataFrame:
+    """Combine continuous and categorical variables into a single DataFrame.
+
+    Args:
+        cont_vars (pd.DataFrame): DataFrame containing continuous variables.
+        cat_vars (pd.DataFrame): DataFrame containing categorical variables.
+
+    Returns:
+        pd.DataFrame: Combined DataFrame.
+    """
+
+    # Reset indices to keep row alignment
+    cont_vars = cont_vars.reset_index(drop=True)
+    cat_vars = cat_vars.reset_index(drop=True)
+
+    data = pd.concat([cont_vars, cat_vars], axis=1)
+    return data
