@@ -11,6 +11,7 @@ from customer_classification_model.config import MODELS_DIR, PROCESSED_DATA_DIR
 ###### REFACTORED CODE FROM MAIN NOTEBOOK ######
 #Imports:
 import datetime
+import mlflow
 
 
 # Constants used:
@@ -19,7 +20,8 @@ data_gold_path = "./artifacts/train_data_gold.csv"
 data_version = "00000"
 experiment_name = current_date
 
-
+# MLflow setup:
+mlflow.set_experiment(experiment_name)
 
 
 ###### DEFAULT CODE BELOW; MODIFY AS NEEDED ######
