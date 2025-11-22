@@ -84,7 +84,7 @@ def one_hot_cat_cols(cat_vars: pd.DataFrame, other_vars: pd.DataFrame) -> pd.Dat
         print(f"Changed column {col} to float")
     return data
 
-def data_split(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+def data_split_train_test(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """
     Split the data into training and testing sets.
 
