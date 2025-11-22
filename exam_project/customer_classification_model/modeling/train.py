@@ -6,6 +6,23 @@ import typer
 
 from customer_classification_model.config import MODELS_DIR, PROCESSED_DATA_DIR
 
+
+
+###### REFACTORED CODE FROM MAIN NOTEBOOK ######
+#Imports:
+import datetime
+
+
+# Constants used:
+current_date = datetime.datetime.now().strftime("%Y_%B_%d")
+data_gold_path = "./artifacts/train_data_gold.csv"
+data_version = "00000"
+experiment_name = current_date
+
+
+
+
+###### DEFAULT CODE BELOW; MODIFY AS NEEDED ######
 app = typer.Typer()
 
 
