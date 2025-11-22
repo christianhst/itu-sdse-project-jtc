@@ -1,10 +1,13 @@
 from datetime import datetime
-from  customer_classification_model.data_utils import impute_missing_values
+from customer_classification_model.data_utils import impute_missing_values
 
 import json
 
 import numpy as np
 import pandas as pd
+
+from sklearn.preprocessing import MinMaxScaler
+import joblib
 
 
 # Date limits for data
@@ -91,6 +94,7 @@ def data_cleaning(data: pd.DataFrame) -> pd.DataFrame:
         print(val, ": ", n)
     return data
 
+
 def create_cat_cols(data: pd.DataFrame) -> pd.DataFrame:
     """Convert specified columns to categorical (object) type.
 
@@ -100,26 +104,25 @@ def create_cat_cols(data: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame with categorical columns converted to object type.
     """
-    vars = [
-    "lead_id", "lead_indicator", "customer_group", "onboarding", "source", "customer_code"
-    ]
+    vars = ["lead_id", "lead_indicator", "customer_group", "onboarding", "source", "customer_code"]
 
     for col in vars:
         data[col] = data[col].astype("object")
         print(f"Changed {col} to object type")
     return data
 
+
 def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
     """xx
-    
+
     Args:
         data (pd.DataFrame): Input DataFrame.
-    
+
     Returns:
     """
 
-    cont_vars = data.loc[:, ((data.dtypes=="float64")|(data.dtypes=="int64"))]
-    cat_vars = data.loc[:, (data.dtypes=="object")]
+    cont_vars = data.loc[:, ((data.dtypes == "float64") | (data.dtypes == "int64"))]
+    cat_vars = data.loc[:, (data.dtypes == "object")]
 
     print("\nContinuous columns: \n")
     print(list(cont_vars.columns), indent=4)
@@ -127,31 +130,30 @@ def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
     print(list(cat_vars.columns), indent=4)
     return cont_vars, cat_vars
 
+
 def outliers(cont_vars: pd.DataFrame, z: float = 2.0) -> pd.DataFrame:
     """Detect outliers in continuous variables using +-z standard deviations.
 
     Args:
         cont_vars (pd.DataFrame): continuous variables.
         z (float): Number of standard deviations for clipping.
-        
+
     Returns:
         pd.DataFrame: DataFrame with outliers clipped.
     """
     cont_vars = cont_vars.apply(
-        lambda x: x.clip(
-            lower=x.mean() - z * x.std(),
-            upper=x.mean() + z * x.std()
-        )
+        lambda x: x.clip(lower=x.mean() - z * x.std(), upper=x.mean() + z * x.std())
     )
-    
+
     return cont_vars
+
 
 def impute_continuous(cont_vars: pd.DataFrame) -> pd.DataFrame:
     """Impute missing values in continuous columns.
-    
+
     Args:
         cont_vars (pd.DataFrame): DataFrame containing continuous variables.
-        
+
     Returns:
         pd.DataFrame: DataFrame with missing continuous values imputed.
     """
@@ -161,10 +163,10 @@ def impute_continuous(cont_vars: pd.DataFrame) -> pd.DataFrame:
 
 def impute_categorical(cat_vars: pd.DataFrame) -> pd.DataFrame:
     """Impute missing values in categorical columns.
-    
+
     Args:
         cat_vars (pd.DataFrame): DataFrame containing categorical variables.
-        
+
     Returns:
         pd.DataFrame: DataFrame with missing categorical values imputed.
     """
@@ -173,3 +175,26 @@ def impute_categorical(cat_vars: pd.DataFrame) -> pd.DataFrame:
 
     cat_vars = cat_vars.apply(impute_missing_values)
     return cat_vars
+
+
+def standardize_continuous(
+    cont_vars: pd.DataFrame, scaler_path: str = "./artifacts/scaler.pkl"
+) -> pd.DataFrame:
+    """Standardize continuous variables using MinMaxScaler and save the scaler.
+
+    Args:
+        cont_vars (pd.DataFrame): DataFrame containing continuous variables.
+        scaler_path (str): Path to the scaler.
+
+    Returns:
+        pd.DataFrame: DataFrame with standardized continuous variables.
+    """
+    scaler = MinMaxScaler()
+    scaler.fit(cont_vars)
+
+    # Save the scaler
+    joblib.dump(value=scaler, filename=scaler_path)
+
+    # Transform the continuous variables
+    cont_scaled = pd.DataFrame(scaler.transform(cont_vars), columns=cont_vars.columns)
+    return cont_scaled
