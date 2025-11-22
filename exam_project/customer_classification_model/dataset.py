@@ -1,29 +1,17 @@
-from pathlib import Path
-
-from loguru import logger
-from tqdm import tqdm
-import typer
-
-from customer_classification_model.config import PROCESSED_DATA_DIR, RAW_DATA_DIR
-
-app = typer.Typer()
+import pandas as pd
 
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    input_path: Path = RAW_DATA_DIR / "dataset.csv",
-    output_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
-    # ----------------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Processing dataset...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Processing dataset complete.")
-    # -----------------------------------------
+def load_data(file_path: str) -> pd.DataFrame:
+    """Load dataset from a CSV file.
 
+    Args:
+        file_path (str): Path to the CSV file.
 
-if __name__ == "__main__":
-    app()
+    Returns:
+        pd.DataFrame: Loaded dataset.
+    """
+    data = pd.read_csv(file_path)
+
+    print("Total rows:", data.count())
+    print(data.head().to_string())
+    return data
