@@ -20,6 +20,9 @@ from xgboost import XGBRFClassifier
 from sklearn.model_selection import RandomizedSearchCV
 from scipy.stats import uniform
 from scipy.stats import randint
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import classification_report
 
 
 # Constants used:
@@ -115,7 +118,7 @@ def xgboost_fit(X_train: pd.DataFrame, y_train: pd.Series) -> RandomizedSearchCV
     Returns:
         RandomizedSearchCV: The fitted randomized search model.
     """
-    
+
     model = XGBRFClassifier(random_state=42)
     params = {
         "learning_rate": uniform(1e-2, 3e-1),
@@ -131,6 +134,43 @@ def xgboost_fit(X_train: pd.DataFrame, y_train: pd.Series) -> RandomizedSearchCV
     model_grid.fit(X_train, y_train)
     return model_grid
 
+def xgboost_model_evaluation(model_grid: RandomizedSearchCV, X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series) -> None:
+    """
+    #placeholder
+    """
+
+    best_model_xgboost_params = model_grid.best_params_
+    print("Best xgboost params")
+    print(best_model_xgboost_params)
+
+    y_pred_train = model_grid.predict(X_train)
+    y_pred_test = model_grid.predict(X_test)
+    print("Accuracy train", accuracy_score(y_pred_train, y_train ))
+    print("Accuracy test", accuracy_score(y_pred_test, y_test))
+
+    conf_matrix = confusion_matrix(y_test, y_pred_test)
+    print("Test actual/predicted\n")
+    print(pd.crosstab(y_test, y_pred_test, rownames=['Actual'], colnames=['Predicted'], margins=True),'\n')
+    print("Classification report\n")
+    print(classification_report(y_test, y_pred_test),'\n')
+
+    conf_matrix = confusion_matrix(y_train, y_pred_train)
+    print("Train actual/predicted\n")
+    print(pd.crosstab(y_train, y_pred_train, rownames=['Actual'], colnames=['Predicted'], margins=True),'\n')
+    print("Classification report\n")
+    print(classification_report(y_train, y_pred_train),'\n')
+
+def xgboost_save_best_model(model_grid: RandomizedSearchCV, y_train: pd.Series, y_pred_train: pd.Series) -> None:
+    """
+    # placeholder
+    """
+    xgboost_model = model_grid.best_estimator_
+    xgboost_model_path = "./artifacts/lead_model_xgboost.json"
+    xgboost_model.save_model(xgboost_model_path)
+
+    model_results = {
+        xgboost_model_path: classification_report(y_train, y_pred_train, output_dict=True)
+    } 
 
 ###### DEFAULT CODE BELOW; MODIFY AS NEEDED ######
 app = typer.Typer()
