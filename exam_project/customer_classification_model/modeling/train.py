@@ -14,6 +14,8 @@ from customer_classification_model.config import MODELS_DIR, PROCESSED_DATA_DIR
 import datetime
 import mlflow
 import pandas as pd
+from sklearn.model_selection import train_test_split 
+from customer_classification_model.data_utils import create_dummy_cols
 
 
 # Constants used:
@@ -58,6 +60,47 @@ def data_type_split(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     other_vars = data.drop(cat_cols, axis=1)
 
     return cat_vars, other_vars
+
+
+def one_hot_cat_cols(cat_vars: pd.DataFrame, other_vars: pd.DataFrame) -> pd.DataFrame:
+    """
+    One-hot encode categorical columns and combine with other variables.
+
+    Args:
+        cat_vars (pd.DataFrame): The categorical variables.
+        other_vars (pd.DataFrame): The other variables.
+    
+    Returns:
+        pd.DataFrame: The combined data with one-hot encoded categorical variables.
+    """
+    for col in cat_vars:
+        cat_vars[col] = cat_vars[col].astype("category")
+        cat_vars = create_dummy_cols(cat_vars, col)
+
+    data = pd.concat([other_vars, cat_vars], axis=1)
+
+    for col in data:
+        data[col] = data[col].astype("float64")
+        print(f"Changed column {col} to float")
+    return data
+
+def data_split(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    """
+    Split the data into training and testing sets.
+
+    Args:
+        data (pd.DataFrame): The input data.
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]: The training and testing sets for features and labels.
+    """
+    y = data["lead_indicator"]
+    X = data.drop(["lead_indicator"], axis=1)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42, test_size=0.15, stratify=y)
+    return X_train, X_test, y_train, y_test
+
+
 
 ###### DEFAULT CODE BELOW; MODIFY AS NEEDED ######
 app = typer.Typer()
