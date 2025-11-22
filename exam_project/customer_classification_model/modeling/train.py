@@ -1,4 +1,5 @@
 from pathlib import Path
+from turtle import pd
 
 from loguru import logger
 from tqdm import tqdm
@@ -12,6 +13,7 @@ from customer_classification_model.config import MODELS_DIR, PROCESSED_DATA_DIR
 #Imports:
 import datetime
 import mlflow
+import pandas as pd
 
 
 # Constants used:
@@ -23,6 +25,39 @@ experiment_name = current_date
 # MLflow setup:
 mlflow.set_experiment(experiment_name)
 
+
+def load_train_data(path: str) -> pd.DataFrame:
+    """
+    Load training data from a CSV file.
+
+    Args:
+        path (str): The file path to the CSV file.
+
+    Returns:
+        pd.DataFrame: The loaded training data.
+    """
+    data = pd.read_csv(path)
+    return data
+
+
+def data_type_split(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Split the data into categorical and other variables.
+
+    Args:
+        data (pd.DataFrame): The input data.
+    
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame]: A tuple containing categorical variables and other variables
+    """
+    data = data.drop(["lead_id", "customer_code", "date_part"], axis=1)
+
+    cat_cols = ["customer_group", "onboarding", "bin_source", "source"]
+    cat_vars = data[cat_cols]
+
+    other_vars = data.drop(cat_cols, axis=1)
+
+    return cat_vars, other_vars
 
 ###### DEFAULT CODE BELOW; MODIFY AS NEEDED ######
 app = typer.Typer()
