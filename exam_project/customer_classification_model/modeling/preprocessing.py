@@ -250,6 +250,35 @@ def save_data_drift(data: pd.DataFrame) -> None:
     data.to_csv("./artifacts/training_data.csv", index=False)
 
 
+def bin_source_column(data: pd.DataFrame) -> pd.DataFrame:
+    """Bin the 'source' column into broader categories.
+
+    Args:
+        data (pd.DataFrame): Input DataFrame.
+
+        Returns:
+        pd.DataFrame: DataFrame with binned 'source' column.
+    """
+    data["bin_source"] = data["source"]
+    values_list = ["li", "organic", "signup", "fb"]
+    data.loc[~data["source"].isin(values_list), "bin_source"] = "Others"
+    mapping = {"li": "socials", "fb": "socials", "organic": "group1", "signup": "group1"}
+
+    data["bin_source"] = data["source"].map(mapping)
+
+    return data
+
+
+def save_gold_medallion(data: pd.DataFrame) -> None:
+    """Save the gold medallion schema and dataset artifacts.
+
+    Args:
+        data (pd.DataFrame): DataFrame containing the data (cont + cat)
+    # Save full training data
+    """
+    data.to_csv("./artifacts/train_data_gold.csv", index=False)
+
+
 if __name__ == "__main__":
     create_directories()
     data = load_data("./artifacts/raw_data.csv")
@@ -264,3 +293,5 @@ if __name__ == "__main__":
     cont_vars = standardize_continuous(cont_vars)
     data = combine_cat_and_cont(cont_vars, cat_vars)
     save_data_drift(data)
+    data = bin_source_column(data)
+    save_gold_medallion(data)
