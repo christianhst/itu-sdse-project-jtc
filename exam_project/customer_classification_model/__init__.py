@@ -1,1 +1,1 @@
-from customer_classification_model import config  # noqa: F401
+# from customer_classification_model import config  # noqa: F401
