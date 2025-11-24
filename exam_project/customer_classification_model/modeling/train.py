@@ -1,5 +1,3 @@
-###### REFACTORED CODE FROM MAIN NOTEBOOK ######
-# Imports:
 import mlflow
 import pandas as pd
 from scipy.stats import randint, uniform
@@ -9,9 +7,6 @@ from xgboost import XGBRFClassifier
 
 from customer_classification_model.constants import data_gold_path, experiment_name
 from customer_classification_model.data_utils import create_dummy_cols
-
-# MLflow setup:
-mlflow.set_experiment(experiment_name)
 
 
 def load_train_data(path: str) -> pd.DataFrame:
@@ -154,6 +149,7 @@ def xgboost_model_evaluation(
     print(classification_report(y_test, y_pred_test), "\n")
 
     conf_matrix = confusion_matrix(y_train, y_pred_train)
+    print(conf_matrix)
     print("Train actual/predicted\n")
     print(
         pd.crosstab(
@@ -178,28 +174,15 @@ def xgboost_save_best_model(
     model_results = {
         xgboost_model_path: classification_report(y_train, y_pred_train, output_dict=True)
     }
-
-
-###### DEFAULT CODE BELOW; MODIFY AS NEEDED ######
-app = typer.Typer()
-
-
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "features.csv",
-    labels_path: Path = PROCESSED_DATA_DIR / "labels.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Training some model...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Modeling training complete.")
-    # -----------------------------------------
+    print(model_results)
 
 
 if __name__ == "__main__":
-    app()
+    mlflow.set_experiment(experiment_name)
+    data = load_train_data(data_gold_path)
+    cat_vars, other_vars = data_type_split(data)
+    data = one_hot_cat_cols(cat_vars, other_vars)
+    X_train, X_test, y_train, y_test = data_split_train_test(data)
+    model_grid = xgboost_fit(X_train, y_train)
+    xgboost_model_evaluation(model_grid, X_train, X_test, y_train, y_test)
+    xgboost_save_best_model(model_grid, y_train, model_grid.predict(X_train))
