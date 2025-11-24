@@ -1,14 +1,20 @@
 from datetime import datetime
-from customer_classification_model.data_utils import impute_missing_values
-
 import json
+import warnings
 
+import joblib
 import numpy as np
 import pandas as pd
-
 from sklearn.preprocessing import MinMaxScaler
-import joblib
 
+from customer_classification_model.data_utils import (
+    create_directories,
+    describe_numeric_col,
+    impute_missing_values,
+)
+from customer_classification_model.dataset import load_data
+
+warnings.filterwarnings("ignore")
 
 # Date limits for data
 max_date = "2024-01-31"
@@ -125,9 +131,9 @@ def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
     cat_vars = data.loc[:, (data.dtypes == "object")]
 
     print("\nContinuous columns: \n")
-    print(list(cont_vars.columns), indent=4)
+    print(list(cont_vars.columns))
     print("\n Categorical columns: \n")
-    print(list(cat_vars.columns), indent=4)
+    print(list(cat_vars.columns))
     return cont_vars, cat_vars
 
 
@@ -144,6 +150,8 @@ def outliers(cont_vars: pd.DataFrame, z: float = 2.0) -> pd.DataFrame:
     cont_vars = cont_vars.apply(
         lambda x: x.clip(lower=x.mean() - z * x.std(), upper=x.mean() + z * x.std())
     )
+    outlier_summary = cont_vars.apply(describe_numeric_col).T
+    outlier_summary.to_csv("./artifacts/outlier_summary.csv")
 
     return cont_vars
 
@@ -174,6 +182,8 @@ def impute_categorical(cat_vars: pd.DataFrame) -> pd.DataFrame:
         cat_vars.loc[cat_vars["customer_code"].isna(), "customer_code"] = "None"
 
     cat_vars = cat_vars.apply(impute_missing_values)
+    cat_missing_impute = cat_vars.mode(numeric_only=False, dropna=True)
+    cat_missing_impute.to_csv("./artifacts/cat_missing_impute.csv")
     return cat_vars
 
 
@@ -217,3 +227,40 @@ def combine_cat_and_cont(cont_vars: pd.DataFrame, cat_vars: pd.DataFrame) -> pd.
 
     data = pd.concat([cont_vars, cat_vars], axis=1)
     return data
+
+
+def save_data_drift(data: pd.DataFrame) -> None:
+    """Save data drift schema and training dataset artifacts.
+
+    Args:
+        data (pd.DataFrame): DataFrame containing the data (cont + cat)
+        schema_path (Path): Output path for the schema JSON file.
+        training_data_path (Path): Output path for the training CSV file.
+
+    Returns:
+        None
+    """
+
+    # Save schema (list of column names)
+    data_columns = list(data.columns)
+    with open("./artifacts/columns_drift.json", "w+") as f:
+        json.dump(data_columns, f)
+
+    # Save full training data
+    data.to_csv("./artifacts/training_data.csv", index=False)
+
+
+if __name__ == "__main__":
+    create_directories()
+    data = load_data("./artifacts/raw_data.csv")
+    time_limit_data(data)
+    data = feature_selection(data)
+    data = data_cleaning(data)
+    data = create_cat_cols(data)
+    cont_vars, cat_vars = separate_cat_and_cont_cols(data)
+    cont_vars = outliers(cont_vars, z=2.0)
+    cont_vars = impute_continuous(cont_vars)
+    cat_vars = impute_categorical(cat_vars)
+    cont_vars = standardize_continuous(cont_vars)
+    data = combine_cat_and_cont(cont_vars, cat_vars)
+    save_data_drift(data)
