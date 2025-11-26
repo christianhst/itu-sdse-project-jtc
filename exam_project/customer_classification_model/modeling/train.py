@@ -11,7 +11,8 @@ from sklearn.metrics import (
     accuracy_score,
     classification_report,
     confusion_matrix,
-    # cohen_kappa_score, f1_score - not used currently
+    f1_score,
+    # cohen_kappa_score,  - not used currently
 )
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from xgboost import XGBRFClassifier
@@ -200,9 +201,8 @@ mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
 experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
 
 
-def build_lr_search() -> RandomizedSearchCV:
+def build_lr_search(model: LogisticRegression) -> RandomizedSearchCV:
     """Create a RandomizedSearchCV for LogisticRegression."""
-    model = LogisticRegression()
 
     params = {
         "solver": ["newton-cg", "lbfgs", "liblinear", "sag", "saga"],
@@ -223,13 +223,31 @@ def train_and_eval_lr(
     y_test: pd.Series,
 ) -> tuple[LogisticRegression, dict, dict]:
     """Fit LR with randomized search and return best model + metrics."""
-    model_grid = build_lr_search()
-    model_grid.fit(X_train, y_train)
 
-    best_model = model_grid.best_estimator_
+    with mlflow.start_run(experiment_id=experiment_id):
+        model_grid = build_lr_search()
+        model_grid.fit(X_train, y_train)
 
-    y_pred_train = best_model.predict(X_train)
-    y_pred_test = best_model.predict(X_test)
+        best_model = model_grid.best_estimator_
+
+        y_pred_train = best_model.predict(X_train)
+        y_pred_test = best_model.predict(X_test)
+
+        # log artifacts
+        mlflow.log_metric("f1_score", f1_score(y_test, y_pred_test))
+        mlflow.log_artifacts("artifacts", artifact_path="model")
+        mlflow.log_param("data_version", "00000")
+
+        # store model for model interpretability
+        model = LogisticRegression()
+        lr_model_path = "./artifacts/lead_model_lr.pkl"
+        joblib.dump(
+            value=model, filename=lr_model_path
+        )  # it is a bit weird to save basic model, since for XGBoost was the best model saved
+        # this was done in main.py
+
+        # Custom python model for predicting probability
+        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(model))
 
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
@@ -239,7 +257,7 @@ def train_and_eval_lr(
     print("Accuracy train:", accuracy_score(y_train, y_pred_train))
     print("Accuracy test:", accuracy_score(y_test, y_pred_test))
 
-    conf_matrix_test = confusion_matrix(y_test, y_pred_test)
+    # conf_matrix_test = confusion_matrix(y_test, y_pred_test) NOT ACCESSED
     print("Test actual/predicted\n")
 
     print(
@@ -251,7 +269,7 @@ def train_and_eval_lr(
     print("Classification report\n")
     print(classification_report(y_test, y_pred_test), "\n")
 
-    conf_matrix_train = confusion_matrix(y_train, y_pred_train)
+    # conf_matrix_train = confusion_matrix(y_train, y_pred_train) NOT ACCESSED
     print("Train actual/predicted\n")
 
     print(
@@ -263,10 +281,26 @@ def train_and_eval_lr(
     print("Classification report\n")
     print(classification_report(y_train, y_pred_train), "\n")
 
-    model_results[lr_model_path] = model_classification_report
+    model_results = {lr_model_path: model_classification_report}  # NOT ACCESSED
     print(model_classification_report["weighted avg"]["f1-score"])
 
     return best_model, model_classification_report, best_model_lr_params
+
+
+def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -> None:
+    # Save column list
+    column_list_path = "./artifacts/columns_list.json"
+    with open(column_list_path, "w+") as columns_file:
+        columns = {"column_names": list(X_train.columns)}
+        pprint(columns)
+        json.dump(columns, columns_file)
+    print("Saved column list to ", column_list_path)
+
+    # Save model results
+    model_results_path = "./artifacts/model_results.json"
+    with open(model_results_path, "w+") as results_file:
+        json.dump(model_results, results_file)
+    print("Saved model_results to ", model_results_path)
 
 
 if __name__ == "__main__":
