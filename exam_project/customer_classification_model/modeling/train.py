@@ -1,3 +1,4 @@
+import json
 import os
 
 import joblib
@@ -175,7 +176,7 @@ def xgboost_model_evaluation(
 
 def xgboost_save_best_model(
     model_grid: RandomizedSearchCV, y_train: pd.Series, y_pred_train: pd.Series
-) -> None:
+) -> tuple[str, dict]:
     """
     # placeholder
     """
@@ -187,6 +188,7 @@ def xgboost_save_best_model(
         xgboost_model_path: classification_report(y_train, y_pred_train, output_dict=True)
     }
     print(model_results)
+    return xgboost_model_path, model_results
 
 
 class lr_wrapper(mlflow.pyfunc.PythonModel):
@@ -198,11 +200,20 @@ class lr_wrapper(mlflow.pyfunc.PythonModel):
 
 
 mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
-experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
 
 
-def build_lr_search(model: LogisticRegression) -> RandomizedSearchCV:
-    """Create a RandomizedSearchCV for LogisticRegression."""
+def build_lr_search() -> RandomizedSearchCV:
+    """
+    Create a RandomizedSearchCV for LogisticRegression.
+
+    Args:
+        None
+
+    Returns:
+        RandomizedSearchCV: The randomized search object
+    """
+
+    model = LogisticRegression()
 
     params = {
         "solver": ["newton-cg", "lbfgs", "liblinear", "sag", "saga"],
@@ -221,8 +232,19 @@ def train_and_eval_lr(
     y_train: pd.Series,
     X_test: pd.DataFrame,
     y_test: pd.Series,
-) -> tuple[LogisticRegression, dict, dict]:
-    """Fit LR with randomized search and return best model + metrics."""
+) -> tuple[LogisticRegression, dict, dict, str]:
+    """
+    Fit LR with randomized search and return best model + metrics.
+
+    Args:
+        X_train (pd.DataFrame): Training features
+        y_train (pd.Series): Training labels
+        X_test (pd.DataFrame): Testing features
+        y_test (pd.Series): Testing labels
+
+    Returns:
+        tuple[LogisticRegression, dict, dict]: Best model, classification report, best params
+    """
 
     with mlflow.start_run(experiment_id=experiment_id):
         model_grid = build_lr_search()
@@ -244,10 +266,12 @@ def train_and_eval_lr(
         joblib.dump(
             value=model, filename=lr_model_path
         )  # it is a bit weird to save basic model, since for XGBoost was the best model saved
-        # this was done in main.py
+        # but this was done in main.py
 
         # Custom python model for predicting probability
-        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(model))
+        mlflow.pyfunc.log_model(
+            "model", python_model=lr_wrapper(best_model)
+        )  # I changed original model to best_model, for me it makes more sense
 
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
@@ -281,18 +305,29 @@ def train_and_eval_lr(
     print("Classification report\n")
     print(classification_report(y_train, y_pred_train), "\n")
 
-    model_results = {lr_model_path: model_classification_report}  # NOT ACCESSED
+    # model_results = { lr_model_path: model_classification_report}  # NOT ACCESSED, this line does the same as 273 line - model_classification_report
     print(model_classification_report["weighted avg"]["f1-score"])
 
-    return best_model, model_classification_report, best_model_lr_params
+    return best_model, model_classification_report, best_model_lr_params, lr_model_path
 
 
 def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -> None:
+    """
+    Save column list and model results to artifacts.
+
+    Args:
+        X_train (pd.DataFrame): Training features
+        model_results (dict): Model results dictionary
+
+    Returns:
+        None
+    """
+
     # Save column list
     column_list_path = "./artifacts/columns_list.json"
     with open(column_list_path, "w+") as columns_file:
         columns = {"column_names": list(X_train.columns)}
-        pprint(columns)
+        print(columns)
         json.dump(columns, columns_file)
     print("Saved column list to ", column_list_path)
 
@@ -309,6 +344,24 @@ if __name__ == "__main__":
     cat_vars, other_vars = data_type_split(data)
     data = one_hot_cat_cols(cat_vars, other_vars)
     X_train, X_test, y_train, y_test = data_split_train_test(data)
+
+    # Train and evaluate XGBoost model
     model_grid = xgboost_fit(X_train, y_train)
     xgboost_model_evaluation(model_grid, X_train, X_test, y_train, y_test)
-    xgboost_save_best_model(model_grid, y_train, model_grid.predict(X_train))
+    xgb_model_path, xgb_report = xgboost_save_best_model(
+        model_grid, y_train, model_grid.predict(X_train)
+    )
+
+    # Train and evaluate Logistic Regression model
+    best_model_lr, model_classification_report, best_model_lr_params, lr_model_path = (
+        train_and_eval_lr(X_train, y_train, X_test, y_test)
+    )
+
+    # Combine model_results from BOTH models
+    model_results = {
+        lr_model_path: model_classification_report,
+        xgb_model_path: xgb_report,
+    }
+
+    # Save columns + model_results once
+    save_columns_and_model_results(X_train, model_results)
