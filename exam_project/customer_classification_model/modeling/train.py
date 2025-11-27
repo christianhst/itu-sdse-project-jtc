@@ -199,9 +199,6 @@ class lr_wrapper(mlflow.pyfunc.PythonModel):
         return self.model.predict_proba(model_input)[:, 1]
 
 
-mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
-
-
 def build_lr_search() -> RandomizedSearchCV:
     """
     Create a RandomizedSearchCV for LogisticRegression.
@@ -246,7 +243,7 @@ def train_and_eval_lr(
         tuple[LogisticRegression, dict, dict]: Best model, classification report, best params
     """
 
-    with mlflow.start_run(experiment_id=experiment_id):
+    with mlflow.start_run(run_name="logistic_regression"):
         model_grid = build_lr_search()
         model_grid.fit(X_train, y_train)
 
@@ -305,7 +302,8 @@ def train_and_eval_lr(
     print("Classification report\n")
     print(classification_report(y_train, y_pred_train), "\n")
 
-    # model_results = { lr_model_path: model_classification_report}  # NOT ACCESSED, this line does the same as 273 line - model_classification_report
+    # model_results = { lr_model_path: model_classification_report}
+    # # NOT ACCESSED, this line does the same as 273 line - model_classification_report
     print(model_classification_report["weighted avg"]["f1-score"])
 
     return best_model, model_classification_report, best_model_lr_params, lr_model_path
@@ -340,6 +338,7 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
 
 if __name__ == "__main__":
     mlflow.set_experiment(experiment_name)
+    mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
     data = load_train_data(data_gold_path)
     cat_vars, other_vars = data_type_split(data)
     data = one_hot_cat_cols(cat_vars, other_vars)
