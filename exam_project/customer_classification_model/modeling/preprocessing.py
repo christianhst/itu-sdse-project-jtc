@@ -93,11 +93,7 @@ def data_cleaning(data: pd.DataFrame) -> pd.DataFrame:
     data = data.dropna(axis=0, subset=["lead_id"])
 
     data = data[data.source == "signup"]
-    result = data.lead_indicator.value_counts(normalize=True)
 
-    print("Target value counter")
-    for val, n in zip(result.index, result):
-        print(val, ": ", n)
     return data
 
 
@@ -114,26 +110,23 @@ def create_cat_cols(data: pd.DataFrame) -> pd.DataFrame:
 
     for col in vars:
         data[col] = data[col].astype("object")
-        print(f"Changed {col} to object type")
     return data
 
 
 def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
-    """xx
+    """Separate continuous and categorical columns in the DataFrame.
 
     Args:
         data (pd.DataFrame): Input DataFrame.
 
     Returns:
+        pd.DataFrame: Tuple containing continuous and categorical DataFrames.
     """
 
     cont_vars = data.loc[:, ((data.dtypes == "float64") | (data.dtypes == "int64"))]
     cat_vars = data.loc[:, (data.dtypes == "object")]
 
-    print("\nContinuous columns: \n")
-    print(list(cont_vars.columns))
-    print("\n Categorical columns: \n")
-    print(list(cat_vars.columns))
+    
     return cont_vars, cat_vars
 
 
