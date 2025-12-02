@@ -5,6 +5,7 @@ from mlflow.tracking import MlflowClient
 import pandas as pd
 
 from customer_classification_model.constants import artifact_path, experiment_name, model_name
+from customer_classification_model.mlflow_utils import wait_until_ready
 
 
 def getting_experiment_and_best_model_results(experiment_name=experiment_name):
@@ -78,6 +79,20 @@ def compare_prod_and_best_model():
     return run_id, model_details, model_status
 
 
+def register_model(artifact_path=artifact_path, model_name=model_name):
+    run_id = compare_prod_and_best_model()[0]
+    if run_id is not None:
+        print(f"Best model found: {run_id}")
+
+    model_uri = "runs:/{run_id}/{artifact_path}".format(run_id=run_id, artifact_path=artifact_path)
+    model_details = mlflow.register_model(model_uri=model_uri, name=model_name)
+    wait_until_ready(model_details.name, model_details.version)
+    model_details = dict(model_details)
+    print(model_details)
+
+
 if __name__ == "__main__":
     getting_experiment_and_best_model_results()
     get_production_model()
+    compare_prod_and_best_model()
+    register_model()
