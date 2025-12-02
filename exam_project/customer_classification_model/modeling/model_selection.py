@@ -7,7 +7,7 @@ import pandas as pd
 from customer_classification_model.constants import artifact_path, experiment_name, model_name
 
 
-def getting_experiment_and_best_model_results():
+def getting_experiment_and_best_model_results(experiment_name=experiment_name):
     experiment_ids = [mlflow.get_experiment_by_name(experiment_name).experiment_id]
     experiment_best = mlflow.search_runs(
         experiment_ids=experiment_ids, order_by=["metrics.f1_score DESC"], max_results=1
@@ -44,3 +44,40 @@ def get_production_model():
 
     else:
         print("No model in production")
+
+    return prod_model_exists, (
+        prod_model_version,
+        prod_model_run_id,
+    ) if prod_model_exists else None
+
+
+def compare_prod_and_best_model():
+    experiment_best, _ = getting_experiment_and_best_model_results()
+    train_model_score = experiment_best["metrics.f1_score"]
+    model_details = {}
+    model_status = {}
+    run_id = None
+    prod_model_exists, prod_model_info = get_production_model()
+
+    if prod_model_exists:
+        data, details = mlflow.get_run(prod_model_info[1])
+        prod_model_score = data[1]["metrics.f1_score"]
+
+        model_status["current"] = train_model_score
+        model_status["prod"] = prod_model_score
+
+        if train_model_score > prod_model_score:
+            print("Registering new model")
+            run_id = experiment_best["run_id"]
+    else:
+        print("No model in production")
+        run_id = experiment_best["run_id"]
+
+    print(f"Registered model: {run_id}")
+
+    return run_id, model_details, model_status
+
+
+if __name__ == "__main__":
+    getting_experiment_and_best_model_results()
+    get_production_model()
