@@ -338,7 +338,7 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
 
 if __name__ == "__main__":
     mlflow.set_experiment(experiment_name)
-    # mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
+    mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
     data = load_train_data(data_gold_path)
     cat_vars, other_vars = data_type_split(data)
     data = one_hot_cat_cols(cat_vars, other_vars)
