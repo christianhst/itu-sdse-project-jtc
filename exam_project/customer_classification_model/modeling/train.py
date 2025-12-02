@@ -184,11 +184,9 @@ def xgboost_save_best_model(
     xgboost_model_path = "./artifacts/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
 
-    model_results = {
-        xgboost_model_path: classification_report(y_train, y_pred_train, output_dict=True)
-    }
-    print(model_results)
-    return xgboost_model_path, model_results
+    xgb_report = classification_report(y_train, y_pred_train, output_dict=True)
+    print(xgb_report)
+    return xgboost_model_path, xgb_report
 
 
 class lr_wrapper(mlflow.pyfunc.PythonModel):
