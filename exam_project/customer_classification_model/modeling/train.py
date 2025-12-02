@@ -256,12 +256,8 @@ def train_and_eval_lr(
         mlflow.log_param("data_version", "00000")
 
         # store model for model interpretability
-        model = LogisticRegression()
         lr_model_path = "./artifacts/lead_model_lr.pkl"
-        joblib.dump(
-            value=model, filename=lr_model_path
-        )  # it is a bit weird to save basic model, since for XGBoost was the best model saved
-        # but this was done in main.py
+        joblib.dump(value=best_model, filename=lr_model_path)
 
         # Custom python model for predicting probability
         mlflow.pyfunc.log_model(
