@@ -1,8 +1,7 @@
 import json
-import os
+import warnings
 
 import joblib
-import matplotlib.pyplot as plt
 import mlflow
 import mlflow.pyfunc
 import pandas as pd
@@ -13,13 +12,14 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     f1_score,
-    # cohen_kappa_score,  - not used currently
 )
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
 from xgboost import XGBRFClassifier
 
 from customer_classification_model.constants import data_gold_path, experiment_name
 from customer_classification_model.data_utils import create_dummy_cols
+
+warnings.filterwarnings("ignore")
 
 
 def load_train_data(path: str) -> pd.DataFrame:
@@ -338,7 +338,7 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
 
 if __name__ == "__main__":
     mlflow.set_experiment(experiment_name)
-    mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
+    # mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
     data = load_train_data(data_gold_path)
     cat_vars, other_vars = data_type_split(data)
     data = one_hot_cat_cols(cat_vars, other_vars)
