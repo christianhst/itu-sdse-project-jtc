@@ -12,6 +12,4 @@ def load_data(file_path: str) -> pd.DataFrame:
     """
     data = pd.read_csv(file_path)
 
-    print("Total rows:", data.count())
-    print(data.head().to_string())
     return data

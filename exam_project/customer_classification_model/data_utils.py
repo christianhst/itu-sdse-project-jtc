@@ -5,6 +5,7 @@ import pandas as pd
 
 def create_directories():
     """Create local directories used for artifacts and MLflow tracking."""
+    
     os.makedirs("artifacts", exist_ok=True)
     os.makedirs("mlruns", exist_ok=True)
     os.makedirs("mlruns/.trash", exist_ok=True)
