@@ -21,7 +21,7 @@ max_date = "2024-01-31"
 min_date = "2024-01-01"
 
 
-def time_limit_data(data: pd.DataFrame, max_date=max_date, min_date=min_date):
+def time_limit_data(data: pd.DataFrame, max_date=max_date, min_date=min_date) -> None:
     """Limit data to a specific date range and save the limits to a JSON file.
 
     Args:
@@ -125,7 +125,6 @@ def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
 
     cont_vars = data.loc[:, ((data.dtypes == "float64") | (data.dtypes == "int64"))]
     cat_vars = data.loc[:, (data.dtypes == "object")]
-
     
     return cont_vars, cat_vars
 
@@ -249,7 +248,7 @@ def bin_source_column(data: pd.DataFrame) -> pd.DataFrame:
     Args:
         data (pd.DataFrame): Input DataFrame.
 
-        Returns:
+    Returns:
         pd.DataFrame: DataFrame with binned 'source' column.
     """
     data["bin_source"] = data["source"]
@@ -267,7 +266,6 @@ def save_gold_medallion(data: pd.DataFrame) -> None:
 
     Args:
         data (pd.DataFrame): DataFrame containing the data (cont + cat)
-    # Save full training data
     """
     data.to_csv("./artifacts/train_data_gold.csv", index=False)
 
