@@ -8,7 +8,6 @@ def create_directories():
     os.makedirs("artifacts", exist_ok=True)
     os.makedirs("mlruns", exist_ok=True)
     os.makedirs("mlruns/.trash", exist_ok=True)
-    print("Created artifact and mlruns directories")
 
 
 def describe_numeric_col(x):
