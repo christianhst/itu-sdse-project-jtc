@@ -75,7 +75,7 @@ def one_hot_cat_cols(cat_vars: pd.DataFrame, other_vars: pd.DataFrame) -> pd.Dat
 
     for col in data:
         data[col] = data[col].astype("float64")
-        print(f"Changed column {col} to float")
+        
     return data
 
 
@@ -178,14 +178,21 @@ def xgboost_save_best_model(
     model_grid: RandomizedSearchCV, y_train: pd.Series, y_pred_train: pd.Series
 ) -> tuple[str, dict]:
     """
-    # placeholder
+    Save the best XGBoost model and return its path and classification report.
+
+    Args:
+        model_grid (RandomizedSearchCV): The fitted randomized search model.
+        y_train (pd.Series): Training labels.
+        y_pred_train (pd.Series): Predicted training labels.
+
+    Returns:
+        tuple[str, dict]: The path to the saved model and the classification report.
     """
     xgboost_model = model_grid.best_estimator_
     xgboost_model_path = "./artifacts/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
 
     xgb_report = classification_report(y_train, y_pred_train, output_dict=True)
-    print(xgb_report)
     return xgboost_model_path, xgb_report
 
 
@@ -238,7 +245,7 @@ def train_and_eval_lr(
         y_test (pd.Series): Testing labels
 
     Returns:
-        tuple[LogisticRegression, dict, dict]: Best model, classification report, best params
+        tuple[LogisticRegression, dict, dict, str]: Best model, classification report, best params, model path
     """
 
     with mlflow.start_run(run_name="logistic_regression"):
@@ -323,15 +330,12 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
     column_list_path = "./artifacts/columns_list.json"
     with open(column_list_path, "w+") as columns_file:
         columns = {"column_names": list(X_train.columns)}
-        print(columns)
         json.dump(columns, columns_file)
-    print("Saved column list to ", column_list_path)
 
     # Save model results
     model_results_path = "./artifacts/model_results.json"
     with open(model_results_path, "w+") as results_file:
         json.dump(model_results, results_file)
-    print("Saved model_results to ", model_results_path)
 
 
 if __name__ == "__main__":
