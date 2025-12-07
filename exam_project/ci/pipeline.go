@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"dagger.io/dagger"
 )
@@ -21,7 +20,7 @@ func main() {
 
 func Build(ctx context.Context) error {
 	// Initialize Dagger client
-	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stdout))
+	client, err := dagger.Connect(ctx)
 	if err != nil {
 		return err
 	}
@@ -52,15 +51,15 @@ func Build(ctx context.Context) error {
 		"python", "modeling/train.py",
 	})
 
-	// // Run model_selection script
-	// python = python.WithExec([]string{
-	// 	"python", "modeling/model_selection.py",
-	// })
+	// Run model_selection script
+	python = python.WithExec([]string{
+		"python", "modeling/model_selection.py",
+	})
 
-	// // Run deployment script
-	// python = python.WithExec([]string{
-	// 	"python", "modeling/deploy_model.py",
-	// })
+	// Run deployment script
+	python = python.WithExec([]string{
+		"python", "modeling/deploy_model.py",
+	})
 
 	// Clean up unnecessary files
 	python = python.WithExec([]string{
