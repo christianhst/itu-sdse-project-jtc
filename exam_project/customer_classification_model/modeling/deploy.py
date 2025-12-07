@@ -9,6 +9,17 @@ warnings.filterwarnings("ignore")
 
 
 def deploy_model():
+    """
+    Deploys the specified model to the staging environment in MLflow Model Registry.
+    If the model is not already in the "Staging" stage, it transitions the model
+    to "Staging" and waits for the deployment to complete.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     model_version = 1
     client = MlflowClient()
 
