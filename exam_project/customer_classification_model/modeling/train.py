@@ -242,6 +242,7 @@ def train_and_eval_lr(
     """
 
     with mlflow.start_run(run_name="logistic_regression"):
+        model = LogisticRegression()
         model_grid = build_lr_search()
         model_grid.fit(X_train, y_train)
 
@@ -256,17 +257,11 @@ def train_and_eval_lr(
         mlflow.log_param("data_version", "00000")
 
         # store model for model interpretability
-        model = LogisticRegression()
         lr_model_path = "./artifacts/lead_model_lr.pkl"
-        joblib.dump(
-            value=model, filename=lr_model_path
-        )  # it is a bit weird to save basic model, since for XGBoost was the best model saved
-        # but this was done in main.py
+        joblib.dump(value=model, filename=lr_model_path)
 
         # Custom python model for predicting probability
-        mlflow.pyfunc.log_model(
-            "model", python_model=lr_wrapper(best_model)
-        )  # I changed original model to best_model, for me it makes more sense
+        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(model))
 
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
