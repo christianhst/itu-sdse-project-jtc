@@ -26,8 +26,8 @@ jobs:
           args: go run pipeline.go
           version: "0.19.6"
 
-      - name: Upload Encrypted Model Artifact
+      - name: Upload Model Artifact
         uses: actions/upload-artifact@v4.4.0
         with:
           name: model
-          path: test/model/model.pkl.enc
+          path: exam_project/ci/outputs/lead_model_lr.pkl 
