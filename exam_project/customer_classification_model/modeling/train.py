@@ -153,12 +153,12 @@ def xgboost_model_evaluation(
 
     best_model_xgboost_params = model_grid.best_params_
     print("Best xgboost params")
-    print(best_model_xgboost_params)
+    print(best_model_xgboost_params, "\n")
 
     y_pred_train = model_grid.predict(X_train)
     y_pred_test = model_grid.predict(X_test)
     print("Accuracy train", accuracy_score(y_pred_train, y_train))
-    print("Accuracy test", accuracy_score(y_pred_test, y_test))
+    print("Accuracy test", accuracy_score(y_pred_test, y_test), "\n")
 
     print("Test actual/predicted\n")
     print(
@@ -277,7 +277,6 @@ def train_and_eval_lr(
     print("Accuracy train:", accuracy_score(y_train, y_pred_train))
     print("Accuracy test:", accuracy_score(y_test, y_pred_test), "\n")
 
-    # conf_matrix_test = confusion_matrix(y_test, y_pred_test) NOT ACCESSED
     print("Test actual/predicted\n")
 
     print(
@@ -288,22 +287,6 @@ def train_and_eval_lr(
     )
     print("Classification report\n")
     print(classification_report(y_test, y_pred_test), "\n")
-
-    # conf_matrix_train = confusion_matrix(y_train, y_pred_train) NOT ACCESSED
-    print("Train actual/predicted\n")
-
-    print(
-        pd.crosstab(
-            y_train, y_pred_train, rownames=["Actual"], colnames=["Predicted"], margins=True
-        ),
-        "\n",
-    )
-    print("Classification report\n")
-    print(classification_report(y_train, y_pred_train), "\n")
-
-    # model_results = { lr_model_path: model_classification_report}
-    # # NOT ACCESSED, this line does the same as 273 line - model_classification_report
-    print(model_classification_report["weighted avg"]["f1-score"])
 
     return best_model, model_classification_report, best_model_lr_params, lr_model_path
 
