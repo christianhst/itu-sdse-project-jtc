@@ -138,7 +138,17 @@ def xgboost_model_evaluation(
     y_test: pd.Series,
 ) -> None:
     """
-    #placeholder
+    Evaluate the XGBoost model and print performance metrics.
+    
+    Args:
+        model_grid (RandomizedSearchCV): The fitted randomized search model.
+        X_train (pd.DataFrame): Training features.
+        X_test (pd.DataFrame): Testing features.
+        y_train (pd.Series): Training labels.
+        y_test (pd.Series): Testing labels. 
+        
+    Returns:
+        None
     """
 
     best_model_xgboost_params = model_grid.best_params_
