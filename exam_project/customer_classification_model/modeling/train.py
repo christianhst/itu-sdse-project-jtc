@@ -188,6 +188,7 @@ def xgboost_save_best_model(
     xgboost_model = model_grid.best_estimator_
     xgboost_model_path = "./artifacts/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
+    print("XGBoost model saved to", xgboost_model_path)
 
     xgb_report = classification_report(y_train, y_pred_train, output_dict=True)
     return xgboost_model_path, xgb_report
