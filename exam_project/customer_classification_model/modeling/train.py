@@ -188,7 +188,6 @@ def xgboost_save_best_model(
     xgboost_model = model_grid.best_estimator_
     xgboost_model_path = "./artifacts/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
-    print("XGBoost model saved to", xgboost_model_path, "\n")
 
     xgb_report = classification_report(y_train, y_pred_train, output_dict=True)
     return xgboost_model_path, xgb_report
@@ -303,13 +302,11 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
         None
     """
 
-    # Save column list
     column_list_path = "./artifacts/columns_list.json"
     with open(column_list_path, "w+") as columns_file:
         columns = {"column_names": list(X_train.columns)}
         json.dump(columns, columns_file)
 
-    # Save model results
     model_results_path = "./artifacts/model_results.json"
     with open(model_results_path, "w+") as results_file:
         json.dump(model_results, results_file)
@@ -329,11 +326,13 @@ if __name__ == "__main__":
     xgb_model_path, xgb_report = xgboost_save_best_model(
         model_grid, y_train, model_grid.predict(X_train)
     )
+    print(f"XGBoost model saved to {xgb_model_path}\n")
 
     # Train and evaluate Logistic Regression model
     best_model_lr, model_classification_report, best_model_lr_params, lr_model_path = (
         train_and_eval_lr(X_train, y_train, X_test, y_test)
     )
+    print(f"Logistic Regression training complete. Model saved to: {lr_model_path}\n")
 
     # Combine model_results from BOTH models
     model_results = {
@@ -343,3 +342,5 @@ if __name__ == "__main__":
 
     # Save columns + model_results once
     save_columns_and_model_results(X_train, model_results)
+    print("Column names and model results saved to artifacts folder.")
+    print("Training pipeline completed successfully.")
