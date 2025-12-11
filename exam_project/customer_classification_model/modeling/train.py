@@ -188,7 +188,7 @@ def xgboost_save_best_model(
     xgboost_model = model_grid.best_estimator_
     xgboost_model_path = "./artifacts/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
-    print("XGBoost model saved to", xgboost_model_path)
+    print("XGBoost model saved to", xgboost_model_path, "\n")
 
     xgb_report = classification_report(y_train, y_pred_train, output_dict=True)
     return xgboost_model_path, xgb_report
@@ -222,7 +222,7 @@ def build_lr_search() -> RandomizedSearchCV:
     }
 
     model_grid = RandomizedSearchCV(
-        estimator=model, param_distributions=params, n_iter=10, cv=3, verbose=3
+        estimator=model, param_distributions=params, n_iter=10, cv=3, verbose=1
     )
     return model_grid
 
@@ -255,31 +255,27 @@ def train_and_eval_lr(
         y_pred_train = best_model.predict(X_train)
         y_pred_test = best_model.predict(X_test)
 
-        # log artifacts
         mlflow.log_metric("f1_score", f1_score(y_test, y_pred_test))
         mlflow.log_artifacts("artifacts", artifact_path="model")
         mlflow.log_param("data_version", "00000")
 
-        # store model for model interpretability
         model = LogisticRegression()
         lr_model_path = "./artifacts/lead_model_lr.pkl"
         joblib.dump(
             value=model, filename=lr_model_path
-        )  # it is a bit weird to save basic model, since for XGBoost was the best model saved
-        # but this was done in main.py
+        )  
 
-        # Custom python model for predicting probability
         mlflow.pyfunc.log_model(
             "model", python_model=lr_wrapper(best_model)
-        )  # I changed original model to best_model, for me it makes more sense
-
+        )  
+        
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
 
     print("Best lr params")
-    print(best_model_lr_params)
+    print(best_model_lr_params, "\n")
     print("Accuracy train:", accuracy_score(y_train, y_pred_train))
-    print("Accuracy test:", accuracy_score(y_test, y_pred_test))
+    print("Accuracy test:", accuracy_score(y_test, y_pred_test), "\n")
 
     # conf_matrix_test = confusion_matrix(y_test, y_pred_test) NOT ACCESSED
     print("Test actual/predicted\n")
