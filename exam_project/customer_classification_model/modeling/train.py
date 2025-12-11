@@ -123,7 +123,7 @@ def xgboost_fit(X_train: pd.DataFrame, y_train: pd.Series) -> RandomizedSearchCV
     }
 
     model_grid = RandomizedSearchCV(
-        model, param_distributions=params, n_jobs=-1, verbose=3, n_iter=10, cv=10
+        model, param_distributions=params, n_jobs=-1, verbose=1, n_iter=10, cv=10
     )
 
     model_grid.fit(X_train, y_train)
@@ -150,7 +150,6 @@ def xgboost_model_evaluation(
     print("Accuracy train", accuracy_score(y_pred_train, y_train))
     print("Accuracy test", accuracy_score(y_pred_test, y_test))
 
-    conf_matrix = confusion_matrix(y_test, y_pred_test)
     print("Test actual/predicted\n")
     print(
         pd.crosstab(
@@ -160,18 +159,6 @@ def xgboost_model_evaluation(
     )
     print("Classification report\n")
     print(classification_report(y_test, y_pred_test), "\n")
-
-    conf_matrix = confusion_matrix(y_train, y_pred_train)
-    print(conf_matrix)
-    print("Train actual/predicted\n")
-    print(
-        pd.crosstab(
-            y_train, y_pred_train, rownames=["Actual"], colnames=["Predicted"], margins=True
-        ),
-        "\n",
-    )
-    print("Classification report\n")
-    print(classification_report(y_train, y_pred_train), "\n")
 
 
 def xgboost_save_best_model(
