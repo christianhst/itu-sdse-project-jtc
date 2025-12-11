@@ -286,3 +286,4 @@ if __name__ == "__main__":
     save_data_drift(data)
     data = bin_source_column(data)
     save_gold_medallion(data)
+    print("Preprocessing completed and artifacts saved.")
