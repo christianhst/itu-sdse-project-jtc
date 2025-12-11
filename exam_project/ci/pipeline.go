@@ -42,6 +42,8 @@ func Build(ctx context.Context) error {
 	// Change working directory to the model folder
 	python = python.WithWorkdir("/project/customer_classification_model")
 
+	python = python.WithExec([]string{"dvc", "pull", "artifacts/raw_data.csv.dvc"})
+
 	// Run preprocessing script
 	python = python.WithExec([]string{
 		"python", "modeling/preprocessing.py",
