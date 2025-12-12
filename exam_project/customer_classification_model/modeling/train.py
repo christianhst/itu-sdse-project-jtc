@@ -4,6 +4,7 @@ import warnings
 import joblib
 import mlflow
 import mlflow.pyfunc
+from numpy import mod
 import pandas as pd
 from scipy.stats import randint, uniform
 from sklearn.linear_model import LogisticRegression
@@ -242,7 +243,7 @@ def train_and_eval_lr(
     """
 
     with mlflow.start_run(run_name="logistic_regression"):
-        model = LogisticRegression()
+        # model = LogisticRegression()
         model_grid = build_lr_search()
         model_grid.fit(X_train, y_train)
 
@@ -258,10 +259,10 @@ def train_and_eval_lr(
 
         # store model for model interpretability
         lr_model_path = "./artifacts/lead_model_lr.pkl"
-        joblib.dump(value=model, filename=lr_model_path)
+        joblib.dump(value=best_model, filename=lr_model_path)
 
         # Custom python model for predicting probability
-        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(model))
+        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(best_model))
 
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
