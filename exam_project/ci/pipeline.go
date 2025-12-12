@@ -20,6 +20,12 @@ func main() {
 }
 
 func Build(ctx context.Context) error {
+	// Define project and model directories
+	const (
+		projectDir = "/project/exam_project"
+		modelDir   = projectDir + "/customer_classification_model"
+	)
+
 	// Initialize Dagger client
 	client, err := dagger.Connect(ctx, dagger.WithLogOutput(os.Stdout))
 	if err != nil {
@@ -30,8 +36,8 @@ func Build(ctx context.Context) error {
 	// Set up Python environment and mount project directory
 	python := client.Container().
 		From("python:3.11-bookworm").
-		WithDirectory("/project", client.Host().Directory("..")).
-		WithWorkdir("/project").
+		WithDirectory("/project", client.Host().Directory("../..")).
+		WithWorkdir(projectDir).
 		WithExec([]string{"python", "--version"})
 
 	// Install dependencies
@@ -40,9 +46,9 @@ func Build(ctx context.Context) error {
 	})
 
 	// Change working directory to the model folder
-	python = python.WithWorkdir("/project/customer_classification_model")
+	python = python.WithWorkdir(modelDir)
 
-	python = python.WithExec([]string{"dvc", "pull", "artifacts/raw_data.csv.dvc"})
+	python = python.WithExec([]string{"dvc", "update", "artifacts/raw_data.csv.dvc"})
 
 	// Run preprocessing script
 	python = python.WithExec([]string{
@@ -71,7 +77,7 @@ func Build(ctx context.Context) error {
 
 	// Export artifacts
 	_, err = python.
-		Directory("/project/customer_classification_model/artifacts").
+		Directory(modelDir+"/artifacts").
 		Export(ctx, "output/artifacts")
 	if err != nil {
 		return err
