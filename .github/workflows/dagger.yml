@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4.4.0
         with:
           name: model
-          path: exam_project/ci/output/lead_model_lr.pkl
+          path: exam_project/ci/output/artifacts/lead_model_lr.pkl
 
   test_model: 
     name: Test model with model inference test action
