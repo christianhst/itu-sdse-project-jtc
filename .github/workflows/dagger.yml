@@ -1,9 +1,6 @@
 name: Train and test model (Dagger pipeline)
 
 on:
-  push:
-    branches:
-      - 18-create-github-automation-workflow
   workflow_dispatch:
 
 jobs:
