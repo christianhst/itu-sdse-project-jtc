@@ -45,10 +45,13 @@ func Build(ctx context.Context) error {
 		"pip", "install", "--no-cache-dir", "-r", "requirements.txt",
 	})
 
+	python = python.
+		WithWorkdir(projectDir + "/data").
+		WithExec([]string{"dvc", "update", "raw/raw_data.csv.dvc"}).
+		WithWorkdir(projectDir)
+
 	// Change working directory to the model folder
 	python = python.WithWorkdir(modelDir)
-
-	python = python.WithExec([]string{"dvc", "update", "artifacts/raw_data.csv.dvc"})
 
 	// Run preprocessing script
 	python = python.WithExec([]string{
@@ -79,6 +82,14 @@ func Build(ctx context.Context) error {
 	_, err = python.
 		Directory(modelDir+"/artifacts").
 		Export(ctx, "output/artifacts")
+	if err != nil {
+		return err
+	}
+
+	// Export data
+	_, err = python.
+		Directory(projectDir+"/data/processed").
+		Export(ctx, "output/data/processed")
 	if err != nil {
 		return err
 	}
