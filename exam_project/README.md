@@ -65,3 +65,19 @@ The structure of the repository/project is as follows:
 
 --------
 
+## Setup
+
+To run the scripts manually on your local machine, you need to follow these steps before: 
+- create virtual environment
+- activate virtual environmnet
+- download dependcies using requirements.txt file
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+
+
+To run project inside the github go to the actions pain, select "Customer Classificationm Model Pipeline (train, upload and test model)" an press "Run workflow" buttom. 
