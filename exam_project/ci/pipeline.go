@@ -22,8 +22,8 @@ func main() {
 func Build(ctx context.Context) error {
 	// Define project and model directories
 	const (
-		projectDir = "/project/exam_project"
-		modelDir   = projectDir + "/customer_classification_model"
+		projectDir  = "/project/exam_project"
+		modelingDir = projectDir + "/customer_classification_model"
 	)
 
 	// Initialize Dagger client
@@ -51,7 +51,7 @@ func Build(ctx context.Context) error {
 		WithWorkdir(projectDir)
 
 	// Change working directory to the model folder
-	python = python.WithWorkdir(modelDir)
+	python = python.WithWorkdir(modelingDir)
 
 	// Run preprocessing script
 	python = python.WithExec([]string{
@@ -80,7 +80,7 @@ func Build(ctx context.Context) error {
 
 	// Export artifacts
 	_, err = python.
-		Directory(modelDir+"/artifacts").
+		Directory(modelingDir+"/artifacts").
 		Export(ctx, "output/artifacts")
 	if err != nil {
 		return err
@@ -90,6 +90,14 @@ func Build(ctx context.Context) error {
 	_, err = python.
 		Directory(projectDir+"/data/processed").
 		Export(ctx, "output/data/processed")
+	if err != nil {
+		return err
+	}
+
+	// Export models
+	_, err = python.
+		Directory(projectDir+"/models").
+		Export(ctx, "output/models")
 	if err != nil {
 		return err
 	}

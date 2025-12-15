@@ -25,7 +25,7 @@ def getting_experiment_and_best_model_results(
         experiment_ids=experiment_ids, order_by=["metrics.f1_score DESC"], max_results=1
     ).iloc[0]
 
-    with open("./artifacts/model_results.json", "r") as f:
+    with open("../models/model_results.json", "r") as f:
         model_results = json.load(f)
         results_df = pd.DataFrame({
             model: val["weighted avg"] for model, val in model_results.items()

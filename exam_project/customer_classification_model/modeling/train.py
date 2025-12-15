@@ -173,7 +173,7 @@ def xgboost_save_best_model(
         tuple[str, dict]: The path to the saved model and the classification report.
     """
     xgboost_model = model_grid.best_estimator_
-    xgboost_model_path = "./artifacts/lead_model_xgboost.json"
+    xgboost_model_path = "../models/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
 
     xgb_report = classification_report(y_test, y_pred_test, output_dict=True)
@@ -245,7 +245,7 @@ def train_and_eval_lr(
         mlflow.log_artifacts("artifacts", artifact_path="model")
         mlflow.log_param("data_version", "00000")
 
-        lr_model_path = "./artifacts/lead_model_lr.pkl"
+        lr_model_path = "../models/lead_model_lr.pkl"
         joblib.dump(value=best_model, filename=lr_model_path)
 
         mlflow.pyfunc.log_model("model", python_model=lr_wrapper(best_model))
@@ -279,7 +279,7 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
         columns = {"column_names": list(X_train.columns)}
         json.dump(columns, columns_file)
 
-    model_results_path = "./artifacts/model_results.json"
+    model_results_path = "../models/model_results.json"
     with open(model_results_path, "w+") as results_file:
         json.dump(model_results, results_file)
 
