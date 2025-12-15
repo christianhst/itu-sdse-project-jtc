@@ -122,7 +122,6 @@ def register_model(artifact_path=artifact_path, model_name=model_name) -> None:
 
 
 if __name__ == "__main__":
-    getting_experiment_and_best_model_results()
     get_production_model()
     compare_prod_and_best_model()
     register_model()
