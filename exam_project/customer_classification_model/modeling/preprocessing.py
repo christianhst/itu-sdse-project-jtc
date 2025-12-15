@@ -11,8 +11,8 @@ from customer_classification_model.data_utils import (
     create_directories,
     describe_numeric_col,
     impute_missing_values,
+    load_data,
 )
-from customer_classification_model.dataset import load_data
 
 warnings.filterwarnings("ignore")
 
@@ -125,7 +125,7 @@ def separate_cat_and_cont_cols(data: pd.DataFrame) -> pd.DataFrame:
 
     cont_vars = data.loc[:, ((data.dtypes == "float64") | (data.dtypes == "int64"))]
     cat_vars = data.loc[:, (data.dtypes == "object")]
-    
+
     return cont_vars, cat_vars
 
 
