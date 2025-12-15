@@ -36,4 +36,6 @@ def deploy_model():
 
 
 if __name__ == "__main__":
+    print("Starting model deployment...\n")
     deploy_model()
+    print("Model deployment completed.\n")
