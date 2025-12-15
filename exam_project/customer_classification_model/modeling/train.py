@@ -8,7 +8,6 @@ import pandas as pd
 from scipy.stats import randint, uniform
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
-    accuracy_score,
     classification_report,
     f1_score,
 )
@@ -287,6 +286,7 @@ def save_columns_and_model_results(X_train: pd.DataFrame, model_results: dict) -
 
 
 if __name__ == "__main__":
+    print("Starting training pipeline...\n")
     mlflow.set_experiment(experiment_name)
     mlflow.sklearn.autolog(log_input_examples=True, log_models=False)
     data = load_train_data(data_gold_path)
