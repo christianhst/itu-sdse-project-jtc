@@ -1,0 +1,50 @@
+name: Train and test model (Dagger pipeline)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  train_model:
+    name: Train and upload model
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: 1.25.4
+          cache: false
+
+      - name: Run Dagger pipeline
+        uses: dagger/dagger-for-github@v8.2.0
+        with:
+          workdir: exam_project/ci 
+          verb: run
+          args: go run pipeline.go
+          version: "0.19.6"
+
+      - name: Prepare model artifact for validator
+        run: |
+          mkdir -p model
+          cp exam_project/ci/output/artifacts/lead_model_lr.pkl model/model.pkl
+
+      - name: Upload Model Artifact
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: model
+          path: model
+
+  test_model: 
+    name: Test model with model inference test action
+    runs-on: ubuntu-latest
+    needs: train_model
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Model Inference Test Action
+        uses: lasselundstenjensen/itu-sdse-project-model-validator@main

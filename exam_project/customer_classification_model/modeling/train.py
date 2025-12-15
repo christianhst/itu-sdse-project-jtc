@@ -4,6 +4,7 @@ import warnings
 import joblib
 import mlflow
 import mlflow.pyfunc
+from numpy import mod
 import pandas as pd
 from scipy.stats import randint, uniform
 from sklearn.linear_model import LogisticRegression
@@ -233,7 +234,7 @@ def train_and_eval_lr(
     """
 
     with mlflow.start_run(run_name="logistic_regression"):
-        model = LogisticRegression()
+        # model = LogisticRegression()
         model_grid = build_lr_search()
         model_grid.fit(X_train, y_train)
 
