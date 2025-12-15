@@ -48,11 +48,11 @@ The structure of the repository/project is as follows:
     │
     ├── __init__.py             <- Makes customer_classification_model a Python module
     │
-    ├── config.py               <- Store useful variables and configuration (not used)
+    ├── constants.py            <- Constants used in the project
     │
-    ├── dataset.py              <- Scripts to download or generate data
+    ├── data_utils.py           <- Utility functions for operation on data
     │
-    ├── features.py             <- Code to create features for modeling
+    ├── mlflow_utils.py         <- utility functions related to MLFlow
     │
     ├── modeling                
     │   ├── __init__.py 
