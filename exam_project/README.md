@@ -6,7 +6,7 @@
 
 Exam project in the course Data Science in Production: MLOps and Software Engineering (Autumn 2025). This project builds a model that identifies users on the website that are new possible customers. This is done by collecting behaviour data from the users as input, and the target is whether they converted/turned into customers - essentially a classification problem. 
 
-The Cookiecutter Data Science template (ccds) has been used for the project structure and configured accordingly. The functioning code consists of python scripts with different purposes in the MLOps cycle and has been wrapped in a dagger pipeline written in Go. This is then run through a GitHub workflow. This ensures consistent behavior across different environments since it is run in a conntainerized structure.
+The Cookiecutter Data Science template (ccds) has been used for the project structure and configured accordingly. The functioning code consists of python scripts with different purposes in the MLOps cycle and has been wrapped in a dagger pipeline written in Go. This is then orchestrated in a GitHub workflow. This ensures consistent behavior across different environments since it is run in a containerized structure.
 
 The structure of the repository/project is as follows:
 
@@ -39,10 +39,9 @@ The structure of the repository/project is as follows:
 ├── requirements.txt   <- The requirements file for reproducing the analysis environment.
 │
 ├── ci  
-│    ├── pipeline.go   <- Dagger pipeline written in go to run the project   
-│    ├── go.sum        <- x
-│    └── go.mod        <- x
-│        
+│    ├── pipeline.go   <- Dagger pipeline written in Go to run the project   
+│    ├── go.sum        <- Go dependency checksums for reproducible builds
+│    └── go.mod        <- Go module definition for the pipeline
 │
 └── customer_classification_model   <- Source code for use in this project.
     │
@@ -67,17 +66,55 @@ The structure of the repository/project is as follows:
 
 ## Setup
 
-To run the scripts manually on your local machine, you need to follow these steps before: 
-- create virtual environment
-- activate virtual environmnet
-- download dependcies using requirements.txt file
+1. Create and activate a virtual environment:
+   - macOS/Linux:
+     ```bash
+     python -m venv .venv
+     source .venv/bin/activate
+     ```
+   - Windows (PowerShell):
+     ```powershell
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Install Docker Desktop (or another Docker engine) and the Dagger CLI for pipeline execution.
+4. Install Go 1.25+ if you want to run the pipeline locally.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+## Running locally
 
+### Individual scripts
 
+1. Fetch the latest raw dataset tracked by DVC:
+   ```bash
+   cd exam_project/data/raw
+   dvc update raw_data.csv.dvc
+   ```
+2. Execute the preprocessing, training, model selection, and deployment scripts:
+   ```bash
+   cd ../../customer_classification_model
+   python modeling/preprocessing.py
+   python modeling/train.py
+   python modeling/model_selection.py
+   python modeling/deploy.py
+   ```
 
-To run project inside the github go to the actions pain, select "Customer Classificationm Model Pipeline (train, upload and test model)" an press "Run workflow" buttom. 
+### Dagger pipeline
+
+1. Ensure Docker is running.
+2. Run the pipeline, which installs dependencies, executes the four scripts, and exports artifacts to `exam_project/ci/output`:
+   ```bash
+   cd exam_project/ci
+   go run .
+   ```
+
+### GitHub Actions
+
+In GitHub, open the **Actions** tab, select **Customer Classification Model Pipeline (train, upload and test model)**, and click **Run workflow**. The workflow runs the same Dagger pipeline and publishes the trained model artifact.
+
+## Data
+
+x
