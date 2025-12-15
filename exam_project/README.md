@@ -1,15 +1,18 @@
-# customer_classification
+# Customer Classification model
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
 
-Exam project in the course Data Science in Production
+Exam project in the course Data Science in Production: MLOps and Software Engineering (Autumn 2025). This project builds a model that identifies users on the website that are new possible customers. This is done by collecting behaviour data from the users as input, and the target is whether they converted/turned into customers - essentially a classification problem. 
+
+The Cookiecutter Data Science template (ccds) has been used for the project structure and configured accordingly. The functioning code consists of python scripts with different purposes in the MLOps cycle and has been wrapped in a dagger pipeline written in Go. This is then run through a GitHub workflow. This ensures consistent behavior across different environments since it is run in a conntainerized structure.
+
+The structure of the repository/project is as follows:
 
 ## Project Organization
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
 ├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
 ├── README.md          <- The top-level README for developers using this project.
 ├── data
