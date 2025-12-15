@@ -111,10 +111,14 @@ def register_model(artifact_path=artifact_path, model_name=model_name) -> None:
     """
 
     run_id = compare_prod_and_best_model()[0]
+    if run_id is not None:
+        print(f"Best model found: {run_id}")
 
     model_uri = "runs:/{run_id}/{artifact_path}".format(run_id=run_id, artifact_path=artifact_path)
     model_details = mlflow.register_model(model_uri=model_uri, name=model_name)
     wait_until_ready(model_details.name, model_details.version)
+    model_details = dict(model_details)
+    print(f"Registered model details: {model_details}")
 
 
 if __name__ == "__main__":
