@@ -152,23 +152,23 @@ def xgboost_model_evaluation(
     y_pred_train = model_grid.predict(X_train)
     y_pred_test = model_grid.predict(X_test)
 
-    print("Classification report train\n")
+    print("Classification report train (XGBoost)\n")
     print(classification_report(y_train, y_pred_train), "\n")
 
-    print("Classification report test\n")
+    print("Classification report test (XGBoost)\n")
     print(classification_report(y_test, y_pred_test), "\n")
 
 
 def xgboost_save_best_model(
-    model_grid: RandomizedSearchCV, y_train: pd.Series, y_pred_train: pd.Series
+    model_grid: RandomizedSearchCV, y_test: pd.Series, y_pred_test: pd.Series
 ) -> tuple[str, dict]:
     """
     Save the best XGBoost model and return its path and classification report.
 
     Args:
         model_grid (RandomizedSearchCV): The fitted randomized search model.
-        y_train (pd.Series): Training labels.
-        y_pred_train (pd.Series): Predicted training labels.
+        y_test (pd.Series): Testing labels.
+        y_pred_test (pd.Series): Predicted testing labels.
 
     Returns:
         tuple[str, dict]: The path to the saved model and the classification report.
@@ -177,7 +177,7 @@ def xgboost_save_best_model(
     xgboost_model_path = "./artifacts/lead_model_xgboost.json"
     xgboost_model.save_model(xgboost_model_path)
 
-    xgb_report = classification_report(y_train, y_pred_train, output_dict=True)
+    xgb_report = classification_report(y_test, y_pred_test, output_dict=True)
     return xgboost_model_path, xgb_report
 
 
@@ -255,20 +255,10 @@ def train_and_eval_lr(
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
 
-    print("Best lr params")
-    print(best_model_lr_params, "\n")
-    print("Accuracy train:", accuracy_score(y_train, y_pred_train))
-    print("Accuracy test:", accuracy_score(y_test, y_pred_test), "\n")
+    print("Classification report train (LR)\n")
+    print(classification_report(y_train, y_pred_train), "\n")
 
-    print("Test actual/predicted\n")
-
-    print(
-        pd.crosstab(
-            y_test, y_pred_test, rownames=["Actual"], colnames=["Predicted"], margins=True
-        ),
-        "\n",
-    )
-    print("Classification report\n")
+    print("Classification report test (LR)\n")
     print(classification_report(y_test, y_pred_test), "\n")
 
     return best_model, model_classification_report, best_model_lr_params, lr_model_path
@@ -308,7 +298,7 @@ if __name__ == "__main__":
     model_grid = xgboost_fit(X_train, y_train)
     xgboost_model_evaluation(model_grid, X_train, X_test, y_train, y_test)
     xgb_model_path, xgb_report = xgboost_save_best_model(
-        model_grid, y_train, model_grid.predict(X_train)
+        model_grid, y_test, model_grid.predict(X_test)
     )
     print(f"XGBoost model saved to {xgb_model_path}\n")
 
