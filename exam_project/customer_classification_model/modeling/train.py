@@ -74,7 +74,7 @@ def one_hot_cat_cols(cat_vars: pd.DataFrame, other_vars: pd.DataFrame) -> pd.Dat
 
     for col in data:
         data[col] = data[col].astype("float64")
-        
+
     return data
 
 
@@ -138,35 +138,24 @@ def xgboost_model_evaluation(
 ) -> None:
     """
     Evaluate the XGBoost model and print performance metrics.
-    
+
     Args:
         model_grid (RandomizedSearchCV): The fitted randomized search model.
         X_train (pd.DataFrame): Training features.
         X_test (pd.DataFrame): Testing features.
         y_train (pd.Series): Training labels.
-        y_test (pd.Series): Testing labels. 
-        
+        y_test (pd.Series): Testing labels.
+
     Returns:
         None
     """
-
-    best_model_xgboost_params = model_grid.best_params_
-    print("Best xgboost params")
-    print(best_model_xgboost_params, "\n")
-
     y_pred_train = model_grid.predict(X_train)
     y_pred_test = model_grid.predict(X_test)
-    print("Accuracy train", accuracy_score(y_pred_train, y_train))
-    print("Accuracy test", accuracy_score(y_pred_test, y_test), "\n")
 
-    print("Test actual/predicted\n")
-    print(
-        pd.crosstab(
-            y_test, y_pred_test, rownames=["Actual"], colnames=["Predicted"], margins=True
-        ),
-        "\n",
-    )
-    print("Classification report\n")
+    print("Classification report train\n")
+    print(classification_report(y_train, y_pred_train), "\n")
+
+    print("Classification report test\n")
     print(classification_report(y_test, y_pred_test), "\n")
 
 
@@ -259,14 +248,10 @@ def train_and_eval_lr(
 
         model = LogisticRegression()
         lr_model_path = "./artifacts/lead_model_lr.pkl"
-        joblib.dump(
-            value=model, filename=lr_model_path
-        )  
+        joblib.dump(value=model, filename=lr_model_path)
 
-        mlflow.pyfunc.log_model(
-            "model", python_model=lr_wrapper(best_model)
-        )  
-        
+        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(best_model))
+
     model_classification_report = classification_report(y_test, y_pred_test, output_dict=True)
     best_model_lr_params = model_grid.best_params_
 
