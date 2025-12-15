@@ -1,4 +1,4 @@
-name: Train and test model (Dagger pipeline)
+name: Customer Classification Model Pipeline (train, upload and test model)
 
 on:
   workflow_dispatch:
