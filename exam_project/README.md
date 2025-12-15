@@ -14,18 +14,18 @@ The structure of the repository/project is as follows:
 
 ```
 ├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
+├── README.md          <- This README describing the structure of the project and how to run the code.
 ├── data
 │   ├── external       <- Data from third party sources (not used in this project).
 │   ├── interim        <- Intermediate data that has been transformed.
 │   ├── processed      <- The final, canonical data set for modeling.
 │   └── raw            <- The original, immutable data dump.
 │
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
+├── docs               <- A default mkdocs project
 │
 ├── models             <- Trained models and model summaries
 │
-├── notebooks          <- Jupyter notebooks. This contains the initial notebook which has been 
+├── notebooks          <- Jupyter notebooks. This contains the initial, provided notebook which has been 
 │                         refactored (main.ipynb)
 │
 ├── pyproject.toml     <- Project configuration file with package metadata for 
@@ -64,7 +64,7 @@ The structure of the repository/project is as follows:
 
 --------
 
-## Setup
+## Setup and how to run the code and generate the model artifact
 
 1. Create and activate a virtual environment:
    - macOS/Linux:
@@ -113,7 +113,7 @@ The structure of the repository/project is as follows:
 
 ### GitHub Actions
 
-In GitHub, open the **Actions** tab, select **Customer Classification Model Pipeline (train, upload and test model)**, and click **Run workflow**. The workflow runs the same Dagger pipeline and publishes the trained model artifact.
+In GitHub, open the **Actions** tab, select **Customer Classification Model Pipeline (train, upload and test model)**, and click **Run workflow**. The workflow runs the same Dagger pipeline and generates the trained model artifact.
 
 ## Data
 
