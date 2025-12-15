@@ -245,9 +245,8 @@ def train_and_eval_lr(
         mlflow.log_artifacts("artifacts", artifact_path="model")
         mlflow.log_param("data_version", "00000")
 
-        model = LogisticRegression()
         lr_model_path = "./artifacts/lead_model_lr.pkl"
-        joblib.dump(value=model, filename=lr_model_path)
+        joblib.dump(value=best_model, filename=lr_model_path)
 
         mlflow.pyfunc.log_model("model", python_model=lr_wrapper(best_model))
 
