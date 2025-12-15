@@ -4,7 +4,6 @@ import warnings
 import joblib
 import mlflow
 import mlflow.pyfunc
-from numpy import mod
 import pandas as pd
 from scipy.stats import randint, uniform
 from sklearn.linear_model import LogisticRegression
@@ -234,7 +233,6 @@ def train_and_eval_lr(
     """
 
     with mlflow.start_run(run_name="logistic_regression"):
-        # model = LogisticRegression()
         model_grid = build_lr_search()
         model_grid.fit(X_train, y_train)
 
@@ -295,7 +293,7 @@ if __name__ == "__main__":
     data = one_hot_cat_cols(cat_vars, other_vars)
     X_train, X_test, y_train, y_test = data_split_train_test(data)
 
-    # Train and evaluate XGBoost model
+    print("Train and evaluate XGBoost model")
     model_grid = xgboost_fit(X_train, y_train)
     xgboost_model_evaluation(model_grid, X_train, X_test, y_train, y_test)
     xgb_model_path, xgb_report = xgboost_save_best_model(
@@ -303,7 +301,7 @@ if __name__ == "__main__":
     )
     print(f"XGBoost model saved to {xgb_model_path}\n")
 
-    # Train and evaluate Logistic Regression model
+    print("Train and evaluate Logistic Regression model")
     best_model_lr, model_classification_report, best_model_lr_params, lr_model_path = (
         train_and_eval_lr(X_train, y_train, X_test, y_test)
     )

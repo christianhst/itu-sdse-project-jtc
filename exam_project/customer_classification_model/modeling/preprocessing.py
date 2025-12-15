@@ -271,6 +271,7 @@ def save_gold_medallion(data: pd.DataFrame) -> None:
 
 
 if __name__ == "__main__":
+    print("Starting preprocessing...\n")
     create_directories()
     data = load_data("./artifacts/raw_data.csv")
     time_limit_data(data)
