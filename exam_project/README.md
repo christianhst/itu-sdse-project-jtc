@@ -55,11 +55,12 @@ The structure of the repository/project is as follows:
     ├── mlflow_utils.py         <- utility functions related to MLFlow
     │
     ├── modeling                
-    │   ├── __init__.py 
-    │   ├── predict.py          <- Code to run model inference with trained models          
-    │   └── train.py            <- Code to train models
-    │
-    └── plots.py                <- Code to create visualizations
+        ├── __init__.py 
+        ├── preprocessing.py    <- Code to preprocess data        
+        ├── train.py            <- Code to train and evaluate models
+        ├── model_selection.py  <- Code to select best model 
+        └── deploy.py           <- Code to deploy best model 
+
 ```
 
 --------
