@@ -13,54 +13,56 @@ The structure of the repository/project is as follows:
 ## Project Organization
 
 ```
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- This README describing the structure of the project and how to run the code.
-├── data
-│   ├── external       <- Data from third party sources (not used in this project).
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data set for modeling.
-│   └── raw            <- The original, immutable data dump.
-│
-├── docs               <- A default mkdocs project
-│
-├── models             <- Trained models and model summaries
-│
-├── notebooks          <- Jupyter notebooks. This contains the initial, provided notebook which has been 
-│                         refactored (main.ipynb)
-│
-├── pyproject.toml     <- Project configuration file with package metadata for 
-│                         customer_classification_model
-│
-├── references         <- Data dictionaries, manuals, and all other explanatory materials (not used).
-│
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc. (not used)
-│   └── figures        <- Generated graphics and figures to be used in reporting (not used)
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment.
-│
-├── ci  
-│    ├── pipeline.go   <- Dagger pipeline written in Go to run the project   
-│    ├── go.sum        <- Go dependency checksums for reproducible builds
-│    └── go.mod        <- Go module definition for the pipeline
-│
-└── customer_classification_model   <- Source code for use in this project.
-    │
-    ├── __init__.py             <- Makes customer_classification_model a Python module
-    │
-    ├── constants.py            <- Constants used in the project
-    │
-    ├── data_utils.py           <- Utility functions for operation on data
-    │
-    ├── mlflow_utils.py         <- utility functions related to MLFlow
-    │
-    └── modeling                
-        ├── __init__.py 
-        ├── preprocessing.py    <- Code to preprocess data        
-        ├── train.py            <- Code to train and evaluate models
-        ├── model_selection.py  <- Code to select best model 
-        └── deploy.py           <- Code to deploy best model 
+exam_project 
+   │ 
+   ├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
+   ├── README.md          <- This README describing the structure of the project and how to run the code.
+   ├── data
+   │   ├── external       <- Data from third party sources (not used in this project).
+   │   ├── interim        <- Intermediate data that has been transformed.
+   │   ├── processed      <- The final, canonical data set for modeling.
+   │   └── raw            <- The original, immutable data dump.
+   │
+   ├── docs               <- A default mkdocs project
+   │
+   ├── models             <- Trained models and model summaries
+   │
+   ├── notebooks          <- Jupyter notebooks. This contains the initial, provided notebook which has been 
+   │                         refactored (main.ipynb)
+   │
+   ├── pyproject.toml     <- Project configuration file with package metadata for 
+   │                         customer_classification_model
+   │
+   ├── references         <- Data dictionaries, manuals, and all other explanatory materials (not used).
+   │
+   ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc. (not used)
+   │   └── figures        <- Generated graphics and figures to be used in reporting (not used)
+   │
+   ├── requirements.txt   <- The requirements file for reproducing the analysis environment.
+   │
+   ├── ci  
+   │    ├── pipeline.go   <- Dagger pipeline written in Go to run the project   
+   │    ├── go.sum        <- Go dependency checksums for reproducible builds
+   │    └── go.mod        <- Go module definition for the pipeline
+   │
+   └── customer_classification_model   <- Source code for use in this project.
+      │
+      ├── __init__.py             <- Makes customer_classification_model a Python module
+      │
+      ├── constants.py            <- Constants used in the project
+      │
+      ├── data_utils.py           <- Utility functions for operation on data
+      │
+      ├── mlflow_utils.py         <- utility functions related to MLFlow
+      │
+      └── modeling                
+         ├── __init__.py 
+         ├── preprocessing.py    <- Code to preprocess data        
+         ├── train.py            <- Code to train and evaluate models
+         ├── model_selection.py  <- Code to select best model 
+         └── deploy.py           <- Code to deploy best model 
 
-```
+   ```
 
 --------
 
