@@ -45,6 +45,7 @@ func Build(ctx context.Context) error {
 		"pip", "install", "--no-cache-dir", "-r", "requirements.txt",
 	})
 
+	// Pull raw data using DVC
 	python = python.
 		WithWorkdir(projectDir + "/data").
 		WithExec([]string{"dvc", "update", "raw/raw_data.csv.dvc"}).
