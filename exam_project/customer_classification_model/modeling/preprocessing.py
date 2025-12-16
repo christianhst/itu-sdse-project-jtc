@@ -239,7 +239,7 @@ def save_data_drift(data: pd.DataFrame) -> None:
         json.dump(data_columns, f)
 
     # Save full training data
-    data.to_csv("./artifacts/training_data.csv", index=False)
+    data.to_csv("../data/interim/training_data.csv", index=False)
 
 
 def bin_source_column(data: pd.DataFrame) -> pd.DataFrame:
@@ -267,13 +267,13 @@ def save_gold_medallion(data: pd.DataFrame) -> None:
     Args:
         data (pd.DataFrame): DataFrame containing the data (cont + cat)
     """
-    data.to_csv("./artifacts/train_data_gold.csv", index=False)
+    data.to_csv("../data/processed/train_data_gold.csv", index=False)
 
 
 if __name__ == "__main__":
     print("Starting preprocessing...\n")
     create_directories()
-    data = load_data("./artifacts/raw_data.csv")
+    data = load_data("../data/raw/raw_data.csv")
     time_limit_data(data)
     data = feature_selection(data)
     data = data_cleaning(data)

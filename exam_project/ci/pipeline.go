@@ -22,8 +22,8 @@ func main() {
 func Build(ctx context.Context) error {
 	// Define project and model directories
 	const (
-		projectDir = "/project/exam_project"
-		modelDir   = projectDir + "/customer_classification_model"
+		projectDir  = "/project/exam_project"
+		modelingDir = projectDir + "/customer_classification_model"
 	)
 
 	// Initialize Dagger client
@@ -45,10 +45,14 @@ func Build(ctx context.Context) error {
 		"pip", "install", "--no-cache-dir", "-r", "requirements.txt",
 	})
 
-	// Change working directory to the model folder
-	python = python.WithWorkdir(modelDir)
+	// Pull raw data using DVC
+	python = python.
+		WithWorkdir(projectDir + "/data").
+		WithExec([]string{"dvc", "update", "raw/raw_data.csv.dvc"}).
+		WithWorkdir(projectDir)
 
-	python = python.WithExec([]string{"dvc", "update", "artifacts/raw_data.csv.dvc"})
+	// Change working directory to the model folder
+	python = python.WithWorkdir(modelingDir)
 
 	// Run preprocessing script
 	python = python.WithExec([]string{
@@ -77,8 +81,24 @@ func Build(ctx context.Context) error {
 
 	// Export artifacts
 	_, err = python.
-		Directory(modelDir+"/artifacts").
+		Directory(modelingDir+"/artifacts").
 		Export(ctx, "output/artifacts")
+	if err != nil {
+		return err
+	}
+
+	// Export data
+	_, err = python.
+		Directory(projectDir+"/data/processed").
+		Export(ctx, "output/data/processed")
+	if err != nil {
+		return err
+	}
+
+	// Export models
+	_, err = python.
+		Directory(projectDir+"/models").
+		Export(ctx, "output/models")
 	if err != nil {
 		return err
 	}

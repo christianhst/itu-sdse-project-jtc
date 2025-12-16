@@ -1,78 +1,136 @@
-# ITU BDS MLOPS'25 - Project
+# Customer Classification model
 
-## Task
+<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
+    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
+</a>
 
-Based on the input provided (see below), fork the repository and restructure the code to adhere to the concepts and ideas you have seen throughout the course.  The diagram below provides a detailed overview of the structure that the solution is expected to follow.   
+Exam project in the course Data Science in Production: MLOps and Software Engineering (Autumn 2025). This project builds a model that identifies users on the website that are new possible customers. This is done by collecting behaviour data from the users as input, and the target is whether they converted/turned into customers - essentially a classification problem. 
 
-![Project architecture](./docs/project-architecture.png)
+The Cookiecutter Data Science template (ccds) has been used for the project structure and configured accordingly. The functioning code consists of python scripts with different purposes in the MLOps cycle and has been wrapped in a dagger pipeline written in Go. This is then orchestrated in a GitHub workflow. This ensures consistent behavior across different environments since it is run in a containerized structure.
 
-For the exam submission, we expect you to submit a pdf containing:
-- the list of members of the group
-- the link to the github.com public repository hosting your solution
-  - following the above, there is *no need* to invite the teaching staff as collaborators
+The structure of the repository/project is as follows:
 
-The repository linked in the submission should contain:
+## Project Organization
 
-- A README.md file that describes the project
-- GitHub automation workflow
-- Dagger workflow (in Go)
-- All history
+```
+exam_project 
+   │ 
+   ├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
+   ├── README.md          <- This README describing the structure of the project and how to run the code.
+   ├── data
+   │   ├── external       <- Data from third party sources (not used in this project).
+   │   ├── interim        <- Intermediate data that has been transformed.
+   │   ├── processed      <- The final, canonical data set for modeling.
+   │   └── raw            <- The original, immutable data dump.
+   │
+   ├── docs               <- A default mkdocs project
+   │
+   ├── models             <- Trained models and model summaries
+   │
+   ├── notebooks          <- Jupyter notebooks. This contains the initial, provided notebook which has been 
+   │                         refactored (main.ipynb)
+   │
+   ├── pyproject.toml     <- Project configuration file with package metadata for 
+   │                         customer_classification_model
+   │
+   ├── references         <- Data dictionaries, manuals, and all other explanatory materials (not used).
+   │
+   ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc. (not used)
+   │   └── figures        <- Generated graphics and figures to be used in reporting (not used)
+   │
+   ├── requirements.txt   <- The requirements file for reproducing the analysis environment.
+   │
+   ├── ci  
+   │    ├── pipeline.go   <- Dagger pipeline written in Go to run the project   
+   │    ├── go.sum        <- Go dependency checksums for reproducible builds
+   │    └── go.mod        <- Go module definition for the pipeline
+   │
+   └── customer_classification_model   <- Source code for use in this project.
+      │
+      ├── __init__.py             <- Makes customer_classification_model a Python module
+      │
+      ├── constants.py            <- Constants used in the project
+      │
+      ├── data_utils.py           <- Utility functions for operation on data
+      │
+      ├── mlflow_utils.py         <- utility functions related to MLFlow
+      │
+      └── modeling                
+         ├── __init__.py 
+         ├── preprocessing.py    <- Code to preprocess data        
+         ├── train.py            <- Code to train and evaluate models
+         ├── model_selection.py  <- Code to select best model 
+         └── deploy.py           <- Code to deploy best model 
 
+   ```
 
-## Inputs
+--------
 
-You are given the following material:
-- Python monolith (see `notebooks` folder)
-- Raw input data (see `notebooks/artifacts` folder)
-- GitHub action to test model inference (see [`model-validator`](https://github.com/lasselundstenjensen/itu-sdse-project-model-validator) action)
+## Setup and how to run the code and generate the model artifact
 
-## Outputs
+1. Create and activate a virtual environment:
+   - macOS/Linux:
+     ```bash
+     python -m venv .venv
+     source .venv/bin/activate
+     ```
+   - Windows (PowerShell):
+     ```powershell
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     ```
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Install Docker Desktop (or another Docker engine) and the Dagger CLI for pipeline execution.
+4. Install Go 1.25+ if you want to run the pipeline locally.
 
-- Your GitHub repository (including all history)
-  - A README.md file that describes the project
-  - GitHub automation workflow
-  - Dagger workflow (in Go)
-- Model artifact produced by GitHub workflow and named 'model'
+## Running locally
 
-> **NOTE:**
-> The Dagger workflow can be run locally or inside the GitHub workflow—both are viable options during development.
->
-> The Dagger workflow can run locally and can also be made to produce outputs locally during development. But when wrapping the Dagger workflow in a GitHub workflow, the output is instead stored inside the GitHub runner (i.e. a virtual machine).
->
-> Use the publicly available [`actions/upload-artifact`](https://github.com/actions/upload-artifact) to store the model artifact in the GitHub worklow pipeline.
->
-> This model artifact can then be picked up by the [action provided](https://github.com/lasselundstenjensen/itu-sdse-project-model-validator), which will run some inference tests to ensure that the correct model was trained.
+### Individual scripts
 
+1. Fetch the latest raw dataset tracked by DVC:
+   ```bash
+   cd exam_project/data/raw
+   dvc update raw_data.csv.dvc
+   ```
+2. Execute the preprocessing, training, model selection, and deployment scripts:
+   ```bash
+   cd ../../customer_classification_model
+   python modeling/preprocessing.py
+   python modeling/train.py
+   python modeling/model_selection.py
+   python modeling/deploy.py
+   ```
 
-## How will we assess
+### Dagger pipeline
 
-Below, we provide information on how we will assess the submission clustered around several aspects.  The list relates to groups of size 3; if your group is of size 4, you are expected also to work on the optional items, i.e., to use pull requests and to provide tests.
+1. Ensure Docker is running.
+2. Run the pipeline, which installs dependencies, executes the four scripts, and exports artifacts to `exam_project/ci/output`:
+   ```bash
+   cd exam_project/ci
+   go run .
+   ```
 
-#### Versioning
+### GitHub Actions
 
-- Use of Git (semantic commit messages, branches, branch longevity, commit frequency/size)
-- Management of data
-- Use of pull requests (OPTIONAL)
+In GitHub, open the **Actions** tab, select **Customer Classification Model Pipeline (train, upload and test model)**, and click **Run workflow**. The workflow runs the same Dagger pipeline and generates the trained model artifact.
 
-#### Programming
+## Data
 
-- Decomposition of Python notebook
-- Adherance to standard data science MLOps project structure
-- Presence of tests (OPTIONAL)
+All data is placed in `exam_project/data` and follows the CCDS structure (`raw → interim → processed`). The raw dataset is versioned with DVC and stays out of Git history.
 
-#### Workflow automation
+- `raw/raw_data.csv.dvc` is a pointer file that knows how to download the CSV from [`Jeppe-T-K/itu-sdse-project-data`](https://github.com/Jeppe-T-K/itu-sdse-project-data).
+- `raw/raw_data.csv` consist of 12,346 rows of website leads collected between `2024-01-01` and `2024-01-31`. Columns include:
+  - Target: `lead_indicator` (`1` = the visitor converted, `0` = no conversion).
+  - Identifiers and lifecycle timestamps: `lead_id`, `customer_code`, `date_part`, `first_booking`, `last_seen`.
+  - Behavior features: `n_visits`, `time_spent`, `purchases`, `visited_learn_more_before_booking`, `visited_faq`.
+  - Channel metadata: `source`, `domain`, `country`, `customer_group`, `onboarding`, `marketing_consent`, `existing_customer`.
 
-- Presence of a workflow that trains the model
-- Presence of a workflow that tests the model
-- Structure of Dagger workflow
-- Orchestration of Dagger workflow through GitHub workflow
+Fetch or refresh the raw file with:
 
-#### Documentation (README.md)
-
-- Description of project structure
-- How to run the code and generate the model artifact
-
-
-## Questions
-
-If you have any questions about the information shared here, please feel free to post them on Learnit. Answers to private emails on this topic will also be shared on Learnit, along with the original email content, so that everyone has access to the same information.
+```bash
+cd exam_project/data/raw
+dvc update raw_data.csv.dvc   # downloads raw_data.csv next to the .dvc file
+```
