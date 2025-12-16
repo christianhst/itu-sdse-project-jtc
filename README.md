@@ -117,4 +117,18 @@ In GitHub, open the **Actions** tab, select **Customer Classification Model Pipe
 
 ## Data
 
-x
+All data is placed in `exam_project/data` and follows the CCDS structure (`raw → interim → processed`). The raw dataset is versioned with DVC and stays out of Git history.
+
+- `raw/raw_data.csv.dvc` is a pointer file that knows how to download the CSV from [`Jeppe-T-K/itu-sdse-project-data`](https://raw.githubusercontent.com/Jeppe-T-K/itu-sdse-project-data/refs/heads/main/raw_data.csv).
+- `raw/raw_data.csv` consist of 12,346 rows of website leads collected between `2024-01-01` and `2024-01-31`. Columns include:
+  - Target: `lead_indicator` (`1` = the visitor converted, `0` = no conversion).
+  - Identifiers and lifecycle timestamps: `lead_id`, `customer_code`, `date_part`, `first_booking`, `last_seen`.
+  - Behavior features: `n_visits`, `time_spent`, `purchases`, `visited_learn_more_before_booking`, `visited_faq`.
+  - Channel metadata: `source`, `domain`, `country`, `customer_group`, `onboarding`, `marketing_consent`, `existing_customer`.
+
+Fetch or refresh the raw file with:
+
+```bash
+cd exam_project/data/raw
+dvc update raw_data.csv.dvc   # downloads raw_data.csv next to the .dvc file
+```
