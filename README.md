@@ -53,7 +53,7 @@ The structure of the repository/project is as follows:
     │
     ├── mlflow_utils.py         <- utility functions related to MLFlow
     │
-    ├── modeling                
+    └── modeling                
         ├── __init__.py 
         ├── preprocessing.py    <- Code to preprocess data        
         ├── train.py            <- Code to train and evaluate models
@@ -119,7 +119,7 @@ In GitHub, open the **Actions** tab, select **Customer Classification Model Pipe
 
 All data is placed in `exam_project/data` and follows the CCDS structure (`raw → interim → processed`). The raw dataset is versioned with DVC and stays out of Git history.
 
-- `raw/raw_data.csv.dvc` is a pointer file that knows how to download the CSV from [`Jeppe-T-K/itu-sdse-project-data`](https://raw.githubusercontent.com/Jeppe-T-K/itu-sdse-project-data/refs/heads/main/raw_data.csv).
+- `raw/raw_data.csv.dvc` is a pointer file that knows how to download the CSV from [`Jeppe-T-K/itu-sdse-project-data`](https://github.com/Jeppe-T-K/itu-sdse-project-data).
 - `raw/raw_data.csv` consist of 12,346 rows of website leads collected between `2024-01-01` and `2024-01-31`. Columns include:
   - Target: `lead_indicator` (`1` = the visitor converted, `0` = no conversion).
   - Identifiers and lifecycle timestamps: `lead_id`, `customer_code`, `date_part`, `first_booking`, `last_seen`.
